@@ -1,5 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxtjs/eslint-module', '@nuxt/image', '@nuxtjs/google-fonts'],
+  modules: [
+    '@nuxtjs/eslint-module',
+    '@nuxt/image',
+    '@nuxtjs/google-fonts',
+    '@nuxtjs/supabase',
+  ],
 });
