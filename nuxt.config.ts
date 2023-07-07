@@ -5,6 +5,17 @@ export default defineNuxtConfig({
     '@nuxtjs/eslint-module',
     '@nuxt/image',
     '@nuxtjs/google-fonts',
+    '@nuxthq/ui',
     '@nuxtjs/supabase',
   ],
+  ui: {
+    icons: ['ic'],
+  },
+  googleFonts: {
+    families: {
+      Poppins: [300, 400, 500, 600],
+      display: 'swap',
+      prefetch: true,
+    },
+  },
 });
