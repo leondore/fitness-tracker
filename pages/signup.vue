@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AlertProps } from 'components/BaseAlert.vue';
 import { useVuelidate } from '@vuelidate/core';
 import {
   required,
@@ -49,11 +50,20 @@ const rules = computed(() => {
 });
 const v$ = useVuelidate(rules, formData);
 
+const alert = reactive<AlertProps>({
+  name: 'signup_alert',
+  show: false,
+  type: 'success',
+  message: '',
+});
+
+const loading = ref(false);
 const client = useSupabaseClient();
 const signUp = async () => {
   v$.value.$validate();
   if (v$.value.$error) return;
 
+  loading.value = true;
   const { data, error } = await client.auth.signUp({
     email: formData.email,
     password: formData.password,
@@ -62,13 +72,35 @@ const signUp = async () => {
     },
   });
 
-  console.log(data, error);
+  alert.show = true;
+
+  if (data.user) {
+    alert.type = 'success';
+    alert.message =
+      "You've signed up successfully! Please check your email so you can verify your account.";
+  }
+
+  if (error) {
+    alert.type = 'error';
+    alert.message = 'An error occurred while signing up. Please try again.';
+  }
+
+  loading.value = false;
 };
 </script>
 
 <template>
   <UContainer as="div" class="py-4">
     <h2 class="text-2xl text-center mb-5">Signup</h2>
+    <BaseAlert
+      :show="alert.show"
+      :type="alert.type"
+      :name="alert.name"
+      :message="alert.message"
+      class="mb-4"
+      @update:show="alert.show = $event"
+    />
+
     <form
       class="p-8 rounded border border-solid border-gray-700 bg-gray-950"
       @submit.prevent="signUp"
@@ -76,10 +108,7 @@ const signUp = async () => {
       <div class="grid grid-cols-2 gap-3 mb-3">
         <BaseInput
           v-model="formData.first_name"
-          type="text"
           leading-icon="i-ic-outline-person"
-          color="indigo"
-          variant="outline"
           size="lg"
           placeholder="First Name"
           :validation-status="v$.first_name"
@@ -89,10 +118,7 @@ const signUp = async () => {
 
         <BaseInput
           v-model="formData.last_name"
-          type="text"
           leading-icon="i-ic-outline-person"
-          color="indigo"
-          variant="outline"
           size="lg"
           placeholder="Last Name"
         />
@@ -102,8 +128,6 @@ const signUp = async () => {
         v-model="formData.email"
         type="email"
         leading-icon="i-ic-outline-alternate-email"
-        color="indigo"
-        variant="outline"
         size="lg"
         placeholder="Email Address"
         class="mb-3"
@@ -116,8 +140,6 @@ const signUp = async () => {
         v-model="formData.password"
         type="password"
         leading-icon="i-ic-outline-key"
-        color="indigo"
-        variant="outline"
         size="lg"
         placeholder="Password"
         class="mb-3"
@@ -130,8 +152,6 @@ const signUp = async () => {
         v-model="formData.confirm_password"
         type="password"
         leading-icon="i-ic-outline-key"
-        color="indigo"
-        variant="outline"
         size="lg"
         placeholder="Confirm Password"
         class="mb-3"
@@ -140,7 +160,14 @@ const signUp = async () => {
         @blur="v$.confirm_password.$touch"
       />
 
-      <UButton type="submit" color="indigo" variant="solid" size="md" block>
+      <UButton
+        type="submit"
+        color="indigo"
+        variant="solid"
+        size="md"
+        block
+        :loading="loading"
+      >
         Signup
       </UButton>
 

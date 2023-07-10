@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
   leadingIcon: undefined,
   trailingIcon: undefined,
   color: 'indigo',
-  variant: 'none',
+  variant: 'outline',
   size: 'md',
   placeholder: '',
   validationStatus: () => ({}),
@@ -46,7 +46,7 @@ const value = computed({
 
 const fieldColor = computed(() => {
   if (props.validationStatus.$dirty) {
-    return props.validationStatus.$invalid ? 'red' : 'emerald';
+    return props.validationStatus.$invalid ? 'red' : 'green';
   }
 
   return props.color;
