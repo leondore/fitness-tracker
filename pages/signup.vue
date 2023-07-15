@@ -17,6 +17,14 @@ const formData = reactive({
   confirm_password: '',
 });
 
+function clearFormData() {
+  formData.first_name = '';
+  formData.last_name = '';
+  formData.email = '';
+  formData.password = '';
+  formData.confirm_password = '';
+}
+
 const rules = computed(() => {
   return {
     first_name: {
@@ -64,28 +72,42 @@ const signUp = async () => {
   if (v$.value.$error) return;
 
   loading.value = true;
-  const { data, error } = await client.auth.signUp({
-    email: formData.email,
-    password: formData.password,
-    options: {
-      data: { first_name: formData.first_name, last_name: formData.last_name },
-    },
-  });
 
-  alert.show = true;
+  try {
+    const { data, error } = await client.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+        },
+      },
+    });
 
-  if (data.user) {
-    alert.type = 'success';
-    alert.message =
-      "You've signed up successfully! Please check your email so you can verify your account.";
-  }
+    if (error) {
+      throw error;
+    }
 
-  if (error) {
+    if (data.user) {
+      alert.show = true;
+      alert.type = 'success';
+      alert.message =
+        "You've signed up successfully! Please check your email so you can verify your account.";
+    }
+    clearFormData();
+    v$.value.$reset();
+  } catch (error) {
+    let message = 'An error occurred while signing up. Please try again.';
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    alert.show = true;
     alert.type = 'error';
-    alert.message = 'An error occurred while signing up. Please try again.';
+    alert.message = message;
+  } finally {
+    loading.value = false;
   }
-
-  loading.value = false;
 };
 </script>
 

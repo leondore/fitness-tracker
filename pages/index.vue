@@ -1,35 +1,126 @@
 <script setup lang="ts">
+import type { AlertProps } from 'components/BaseAlert.vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, email, helpers } from '@vuelidate/validators';
+
 const formData = reactive({
   email: '',
   password: '',
+});
+
+function clearFormData() {
+  formData.email = '';
+  formData.password = '';
+}
+
+const rules = computed(() => {
+  return {
+    email: {
+      required: helpers.withMessage('The email field is required', required),
+      email: helpers.withMessage('The email is incorrectly formatted', email),
+    },
+    password: {
+      required: helpers.withMessage('The password field is required', required),
+    },
+  };
+});
+const v$ = useVuelidate(rules, formData);
+
+const alert = reactive<AlertProps>({
+  name: 'login_alert',
+  show: false,
+  type: 'error',
+  message: '',
+});
+
+const loading = ref(false);
+const client = useSupabaseClient();
+const login = async () => {
+  v$.value.$validate();
+  if (v$.value.$error) return;
+
+  loading.value = true;
+  try {
+    const { error } = await client.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    if (error) throw error;
+
+    clearFormData();
+    v$.value.$reset();
+  } catch (error) {
+    let message = 'An error occurred while logging in.';
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    alert.show = true;
+    alert.message = message;
+  } finally {
+    loading.value = false;
+  }
+};
+
+const user = useSupabaseUser();
+onMounted(() => {
+  watchEffect(() => {
+    if (user.value) {
+      navigateTo('/admin/exercises');
+    }
+  });
 });
 </script>
 
 <template>
   <UContainer as="div" class="py-4">
     <h2 class="text-2xl text-center mb-5">Login</h2>
-    <form class="p-8 rounded border border-solid border-gray-700 bg-gray-950">
-      <UInput
+    <BaseAlert
+      :show="alert.show"
+      :type="alert.type"
+      :name="alert.name"
+      :message="alert.message"
+      class="mb-4"
+      @update:show="alert.show = $event"
+    />
+
+    <form
+      class="p-8 rounded border border-solid border-gray-700 bg-gray-950"
+      @submit.prevent="login"
+    >
+      <BaseInput
         v-model="formData.email"
         type="email"
-        icon="i-ic-outline-alternate-email"
-        color="indigo"
-        variant="outline"
+        leading-icon="i-ic-outline-alternate-email"
         size="lg"
         placeholder="Email Address"
         class="mb-3"
+        :validation-status="v$.email"
+        @change="v$.email.$touch"
+        @blur="v$.email.$touch"
       />
-      <UInput
+
+      <BaseInput
         v-model="formData.password"
         type="password"
-        icon="i-ic-outline-key"
-        color="indigo"
-        variant="outline"
+        leading-icon="i-ic-outline-key"
         size="lg"
         placeholder="Password"
         class="mb-3"
+        :validation-status="v$.password"
+        @change="v$.password.$touch"
+        @blur="v$.password.$touch"
       />
-      <UButton type="submit" color="indigo" variant="solid" size="md" block>
+
+      <UButton
+        type="submit"
+        color="indigo"
+        variant="solid"
+        size="md"
+        block
+        :loading="loading"
+      >
         Login
       </UButton>
 
