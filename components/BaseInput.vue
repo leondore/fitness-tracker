@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   leadingIcon: undefined,
   trailingIcon: undefined,
-  color: 'indigo',
+  color: 'primary',
   variant: 'outline',
   size: 'md',
   placeholder: '',

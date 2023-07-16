@@ -35,7 +35,7 @@ const color = computed<ColorOpts>(() => {
     case 'info':
       return 'sky';
     default:
-      return 'indigo';
+      return 'primary';
   }
 });
 
