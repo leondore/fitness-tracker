@@ -2189,6 +2189,13 @@ argparse@^2.0.1:
   resolved "https://registry.yarnpkg.com/argparse/-/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
   integrity sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==
 
+aria-query@>=5.0.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/aria-query/-/aria-query-5.3.0.tgz#650c569e41ad90b51b3d7df5e5eed1c7549c103e"
+  integrity sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A==
+  dependencies:
+    dequal "^2.0.3"
+
 array-buffer-byte-length@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/array-buffer-byte-length/-/array-buffer-byte-length-1.0.0.tgz#fabe8bc193fea865f317fe7807085ee0dee5aead"
@@ -3255,6 +3262,11 @@ depd@~1.1.2:
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
   integrity sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==
 
+dequal@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/dequal/-/dequal-2.0.3.tgz#2644214f1997d39ed0ee0ece72335490a7ac67be"
+  integrity sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==
+
 destr@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/destr/-/destr-1.2.2.tgz#7ba9befcafb645a50e76b260449c63927b51e22f"
@@ -3377,6 +3389,11 @@ electron-to-chromium@^1.4.431:
   version "1.4.440"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.440.tgz#d3b1eeb36b717eb479a240c0406ac1fa67901762"
   integrity sha512-r6dCgNpRhPwiWlxbHzZQ/d9swfPaEJGi8ekqRBwQYaR3WmA5VkqQfBWSDDjuJU1ntO+W9tHx8OHV/96Q8e0dVw==
+
+emoji-regex@^10.0.0:
+  version "10.2.1"
+  resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-10.2.1.tgz#a41c330d957191efd3d9dfe6e1e8e1e9ab048b3f"
+  integrity sha512-97g6QgOk8zlDRdgq1WxwgTMgEWGVAQvB5Fdpgc1MkNy56la5SKP9GsMXKDOdqwn90/41a8yPwIGk1Y6WVbeMQA==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -3782,6 +3799,15 @@ eslint-plugin-vue@^9.7.0:
     semver "^7.3.5"
     vue-eslint-parser "^9.3.0"
     xml-name-validator "^4.0.0"
+
+eslint-plugin-vuejs-accessibility@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-vuejs-accessibility/-/eslint-plugin-vuejs-accessibility-2.1.0.tgz#4ea331d509b84f68f161a66ff03c0dbddd79bd4a"
+  integrity sha512-TM0JWrpOUOmka3v83QkH5uYkwUUNWg2RPa6imnBU1El2kRv0Ws1e9N84VPW2HLLTW+Fo+XsdKmiKLXwtIhCqsg==
+  dependencies:
+    aria-query ">=5.0.0"
+    emoji-regex "^10.0.0"
+    vue-eslint-parser "^9.0.1"
 
 eslint-scope@^5.1.1:
   version "5.1.1"
@@ -8787,7 +8813,7 @@ vue-devtools-stub@^0.1.0:
   resolved "https://registry.yarnpkg.com/vue-devtools-stub/-/vue-devtools-stub-0.1.0.tgz#a65b9485edecd4273cedcb8102c739b83add2c81"
   integrity sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==
 
-vue-eslint-parser@^9.3.0:
+vue-eslint-parser@^9.0.1, vue-eslint-parser@^9.3.0:
   version "9.3.1"
   resolved "https://registry.yarnpkg.com/vue-eslint-parser/-/vue-eslint-parser-9.3.1.tgz#429955e041ae5371df5f9e37ebc29ba046496182"
   integrity sha512-Clr85iD2XFZ3lJ52/ppmUDG/spxQu6+MAeHXjjyI4I1NUYZ9xmenQp4N0oaHJhrA8OOxltCVxMRfANGa70vU0g==
