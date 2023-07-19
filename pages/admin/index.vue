@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { userKey } from '@/utils/auth';
-
-const user = inject(userKey);
+const user = useSupabaseUser();
 const client = useSupabaseClient();
 
 const { data } = await useAsyncData('counts', async () => {
@@ -9,10 +7,10 @@ const { data } = await useAsyncData('counts', async () => {
     .from('exercises')
     .select('*', { count: 'exact', head: true });
   const { count: stages } = await client
-    .from('routine_stages')
+    .from('stages')
     .select('*', { count: 'exact', head: true });
   const { count: parts } = await client
-    .from('body_parts')
+    .from('bodyparts')
     .select('*', { count: 'exact', head: true });
 
   return {
@@ -26,7 +24,7 @@ const { data } = await useAsyncData('counts', async () => {
 <template>
   <div>
     <h2 class="text-xl mb-5">
-      Welcome back {{ user?.user_metadata?.first_name || 'friend' }}!
+      Welcome Back {{ user?.user_metadata?.first_name || 'friend' }}!
     </h2>
 
     <div class="grid grid-cols-3 gap-5">

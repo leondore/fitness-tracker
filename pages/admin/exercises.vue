@@ -1,5 +1,20 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const client = useSupabaseClient();
+const { data: exercises } = await useAsyncData('exercises', async () => {
+  return await client.from('exercises').select(`
+      *,
+      stages (
+        name
+      ),
+      bodyparts (
+        name
+      )
+    `);
+});
+</script>
 
 <template>
-  <div>Exercises go here</div>
+  <div>
+    <pre>{{ exercises }}</pre>
+  </div>
 </template>
