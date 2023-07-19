@@ -2,6 +2,7 @@
 import type { AlertProps } from 'components/BaseAlert.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, helpers } from '@vuelidate/validators';
+import { userKey } from '@/utils/auth';
 
 const formData = reactive({
   email: '',
@@ -63,10 +64,10 @@ const login = async () => {
   }
 };
 
-const user = useSupabaseUser();
+const user = inject(userKey);
 onMounted(() => {
   watchEffect(() => {
-    if (user.value) {
+    if (user && user.value) {
       navigateTo('/admin');
     }
   });

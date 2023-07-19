@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { userKey } from '@/utils/auth';
+
 definePageMeta({
   middleware: ['auth'],
 });
@@ -27,10 +29,10 @@ async function logout() {
   await client.auth.signOut();
 }
 
-const user = useSupabaseUser();
+const user = inject(userKey);
 onMounted(() => {
   watchEffect(() => {
-    if (!user.value) {
+    if (user && !user.value) {
       navigateTo('/');
     }
   });
