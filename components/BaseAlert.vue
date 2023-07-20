@@ -6,16 +6,16 @@ export interface AlertProps {
   type?: 'success' | 'error' | 'warning' | 'info';
   message: string;
   timeout?: number;
-  show?: boolean;
+  closeable?: boolean;
 }
 const props = withDefaults(defineProps<AlertProps>(), {
   type: undefined,
   timeout: 0,
-  show: false,
+  closeable: true,
 });
 
 const emits = defineEmits<{
-  (e: 'update:show', value: boolean): void;
+  (e: 'close'): void;
 }>();
 
 const title = computed(() => {
@@ -57,13 +57,19 @@ const icon = computed(() => {
 
 <template>
   <UNotification
-    v-if="show"
     :id="name"
     :icon="icon"
     :title="title"
     :description="message"
     :color="color"
     :timeout="timeout"
-    :callback="() => emits('update:show', false)"
+    :class="{ 'no-close': !closeable }"
+    :callback="() => emits('close')"
   />
 </template>
+
+<style scoped>
+.no-close :deep(button) {
+  display: none;
+}
+</style>

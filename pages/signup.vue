@@ -58,7 +58,7 @@ const rules = computed(() => {
 });
 const v$ = useVuelidate(rules, formData);
 
-const alert = reactive<AlertProps>({
+const alert = reactive<AlertProps & { show: boolean }>({
   name: 'signup_alert',
   show: false,
   type: 'success',
@@ -115,12 +115,12 @@ const signUp = async () => {
   <UContainer as="div" class="py-4">
     <h2 class="text-2xl text-center mb-5">Signup</h2>
     <BaseAlert
-      :show="alert.show"
+      v-if="alert.show"
       :type="alert.type"
       :name="alert.name"
       :message="alert.message"
       class="mb-4"
-      @update:show="alert.show = $event"
+      @close="alert.show = false"
     />
 
     <form

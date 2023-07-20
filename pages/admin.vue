@@ -5,7 +5,7 @@ definePageMeta({
 
 const adminMenu = [
   {
-    to: '/admin',
+    to: '/admin/dashboard',
     label: 'Dashboard',
   },
   {
