@@ -67,7 +67,7 @@ const user = useSupabaseUser();
 onMounted(() => {
   watchEffect(() => {
     if (user.value) {
-      navigateTo('/admin');
+      navigateTo('/admin/dashboard');
     }
   });
 });

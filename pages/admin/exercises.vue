@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { AlertProps } from 'components/BaseAlert.vue';
+
 const client = useSupabaseClient();
-const { data, pending, error } = await useAsyncData(
+const { data, pending } = await useAsyncData(
   'exercises',
   async () => {
     const { data, error } = await client.from('exercises').select(`
@@ -13,11 +15,29 @@ const { data, pending, error } = await useAsyncData(
         name
       )
     `);
-    if (error) throw error;
+    if (error) {
+      alert.message = error.message;
+      alert.show = true;
+    }
     return data;
   },
   { lazy: true }
 );
+
+interface Exercise {
+  id: number;
+  name: string;
+  stages: { name: string }[];
+  bodyparts: { name: string }[];
+}
+const rows = computed<Exercise[] | undefined>(() => data.value || undefined);
+
+const alert = reactive<AlertProps & { show: boolean }>({
+  name: 'exercises_alert',
+  show: false,
+  type: 'error',
+  message: '',
+});
 
 const columns = [
   {
@@ -33,27 +53,92 @@ const columns = [
     label: 'Muscle Groups',
   },
   {
-    key: 'id',
+    key: 'actions',
     label: 'Actions',
   },
 ];
 
-const rows = computed<{ [key: string]: any }[] | undefined>(
-  () => data.value || undefined
-);
+const menuItems = (row: Exercise) => [
+  [
+    {
+      label: 'Edit',
+      icon: 'i-heroicons-pencil-square-20-solid',
+      click: () => navigateTo(`/admin/exercises/${row.id}`),
+    },
+    {
+      label: 'Delete',
+      icon: 'i-heroicons-trash-20-solid',
+      click: () => deleteExercise(row.id),
+    },
+  ],
+];
+
+async function deleteExercise(id: number) {
+  const { error } = await client.from('exercises').delete().eq('id', id);
+
+  if (error) {
+    alert.message = error.message;
+    alert.show = true;
+  }
+}
 </script>
 
 <template>
   <div>
-    <h2 class="text-xl mb-5">Exercises List</h2>
+    <header class="flex item-center justify-between pb-6">
+      <h2 class="text-xl mb-0">Exercises List</h2>
+      <UButton
+        type="button"
+        variant="solid"
+        size="sm"
+        icon="i-heroicons-plus-circle"
+        class="w-32 justify-center"
+        @click="navigateTo('/admin/exercises/new')"
+      >
+        Add New
+      </UButton>
+    </header>
+
     <BaseAlert
-      v-if="error"
+      v-if="alert.show"
       type="error"
       name="Error"
       class="mb-4"
-      :message="error.message"
-      :closeable="false"
+      :message="alert.message"
+      @close="alert.show = false"
     />
-    <UTable :loading="pending" :columns="columns" :rows="rows" />
+
+    <UTable :loading="pending" :columns="columns" :rows="rows">
+      <template #stages-data="{ row }">
+        <div class="flex items-center gap-1.5">
+          <UBadge
+            v-for="(stage, index) in row.stages"
+            :key="`ex${row.id}_stage${index}`"
+            size="sm"
+            >{{ stage.name }}</UBadge
+          >
+        </div>
+      </template>
+
+      <template #bodyparts-data="{ row }">
+        <div class="flex items-center gap-1.5">
+          <UBadge
+            v-for="(bodypart, index) in row.bodyparts"
+            :key="`ex${row.id}_bodypart${index}`"
+            size="sm"
+            >{{ bodypart.name }}</UBadge
+          >
+        </div>
+      </template>
+
+      <template #actions-data="{ row }">
+        <UDropdown :items="menuItems(row)">
+          <UButton
+            variant="ghost"
+            icon="i-heroicons-ellipsis-horizontal-20-solid"
+          />
+        </UDropdown>
+      </template>
+    </UTable>
   </div>
 </template>
