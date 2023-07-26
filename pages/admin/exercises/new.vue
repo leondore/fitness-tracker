@@ -2,7 +2,16 @@
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
-const formData = reactive({
+interface Exercise {
+  name: string;
+  description: string;
+  stages: { id: number; name: string }[];
+  bodyparts: { id: number; name: string }[];
+  video_url: string;
+  image_url: string;
+}
+
+const formData = reactive<Exercise>({
   name: '',
   description: '',
   stages: [],
@@ -19,9 +28,46 @@ const rules = computed(() => {
         required
       ),
     },
+    bodyparts: {
+      required: helpers.withMessage(
+        'You must select at least one muscle group',
+        required
+      ),
+    },
   };
 });
 const v$ = useVuelidate(rules, formData);
+
+const client = useSupabaseClient();
+const {
+  data: stagesOptions,
+  stagesPending,
+  stagesError,
+} = await useAsyncData(
+  'stages',
+  async () => {
+    const { data, error } = await client.from('stages').select('id, name');
+    if (error) throw error;
+    return data;
+  },
+  { lazy: true }
+);
+const {
+  data: muscles,
+  musclesPending,
+  musclesError,
+} = await useAsyncData(
+  'bodyparts',
+  async () => {
+    const { data, error } = await client.from('bodyparts').select('id, name');
+    if (error) throw error;
+    return data;
+  },
+  { lazy: true }
+);
+const musclesOptions = computed<Exercise['bodyparts'] | undefined>(
+  () => muscles.value || undefined
+);
 
 function addExercise() {
   v$.value.$validate();
@@ -54,13 +100,33 @@ function addExercise() {
       <BaseInput
         v-model="formData.name"
         type="text"
-        label="Exercise Name"
+        label="Name"
         size="lg"
-        placeholder="Enter Name"
+        placeholder="Enter a Name"
         class="col-span-2"
         :validation-status="v$.name"
         @change="v$.name.$touch"
         @blur="v$.name.$touch"
+      />
+
+      <BaseTextarea
+        v-model="formData.description"
+        label="Description"
+        placeholder="Enter a Description"
+        class="col-span-2"
+      />
+
+      <BaseSelect
+        v-model="formData.bodyparts"
+        label="Name"
+        multiple
+        size="lg"
+        placeholder="Select a muscle group"
+        class="col-span-1"
+        :options="musclesOptions"
+        :validation-status="v$.bodyparts"
+        @change="v$.bodyparts.$touch"
+        @blur="v$.bodyparts.$touch"
       />
     </form>
   </div>

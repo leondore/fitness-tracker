@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ColorOpts } from '@/types/base';
+import type { ColorOpts } from '@/types';
 
 export interface AlertProps {
   name: string;

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ColorOpts } from 'types/base';
+import type { ColorOpts } from 'types';
 
 interface Props {
   title: string;
   url: string;
-  icon?: `i-ic-${string}`;
+  icon?: `i-${string}`;
   color?: ColorOpts;
 }
 withDefaults(defineProps<Props>(), {

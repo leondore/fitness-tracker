@@ -1,35 +1,28 @@
 <script setup lang="ts">
 import { uid } from 'uid';
-import type { ColorOpts, SizeOpts } from '@/types';
+import type { ColorOpts } from '@/types';
 
-const fieldId = `input_${uid()}`;
+const fieldId = `textarea_${uid()}`;
 
 type ModelValue = string | number | undefined;
 type InputVariant = 'outline' | 'none';
 
 interface Props {
   modelValue?: ModelValue;
-  type?: HTMLInputElement['type'];
   label?: string;
-  leadingIcon?: `i-${string}`;
-  trailingIcon?: `i-${string}`;
   color?: ColorOpts;
   variant?: InputVariant;
-  size?: SizeOpts;
+  rows?: number;
   placeholder?: string;
   disabled?: boolean;
-  loading?: boolean;
   validationStatus?: Record<string, any>;
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
-  type: 'text',
   label: '',
-  leadingIcon: undefined,
-  trailingIcon: undefined,
   color: 'primary',
   variant: 'outline',
-  size: 'md',
+  rows: 4,
   placeholder: '',
   validationStatus: () => ({}),
 });
@@ -57,14 +50,13 @@ const fieldColor = computed(() => {
   return props.color;
 });
 
-const suffixIcon = computed(() => {
-  if (props.validationStatus.$dirty) {
-    return props.validationStatus.$invalid
+const validationIcon = computed(() => {
+  return {
+    name: props.validationStatus.$invalid
       ? 'i-ic-outline-error-outline'
-      : 'i-ic-outline-check-circle-outline';
-  }
-
-  return props.trailingIcon;
+      : 'i-ic-outline-check-circle-outline',
+    color: props.validationStatus.$invalid ? 'text-red-500' : 'text-green-500',
+  };
 });
 
 const displayErrors = computed(
@@ -74,25 +66,22 @@ const displayErrors = computed(
 </script>
 
 <template>
-  <div data-component="input">
+  <div data-component="textarea">
     <label v-if="label" :for="fieldId" class="text-xs inline-flex mb-1">{{
       label
     }}</label>
 
     <div class="relative pb-5">
-      <UInput
+      <UTextarea
         :id="fieldId"
         v-model="value"
-        :type="type"
-        :leading-icon="leadingIcon"
-        :trailing-icon="suffixIcon"
         :color="fieldColor"
         :variant="variant"
-        :size="size"
+        :rows="rows"
         :placeholder="placeholder"
         :disabled="disabled"
-        :loading="loading"
-        loading-icon="i-ic-outline-sync"
+        resize
+        class="w-full px-3.5 py-2.5"
         @change="emits('change', value)"
         @blur="emits('blur', value)"
       />
@@ -103,6 +92,13 @@ const displayErrors = computed(
       >
         {{ props.validationStatus.$errors[0].$message }}
       </small>
+
+      <UIcon
+        v-if="validationStatus.$dirty"
+        :name="validationIcon.name"
+        class="w-5 h-5 absolute top-2 right-3.5"
+        :class="validationIcon.color"
+      />
     </div>
   </div>
 </template>

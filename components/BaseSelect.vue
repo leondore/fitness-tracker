@@ -2,15 +2,16 @@
 import { uid } from 'uid';
 import type { ColorOpts, SizeOpts } from '@/types';
 
-const fieldId = `input_${uid()}`;
+const fieldId = `select_${uid()}`;
 
-type ModelValue = string | number | undefined;
+type ModelValue = string | number | Record<string, any> | undefined;
 type InputVariant = 'outline' | 'none';
 
 interface Props {
   modelValue?: ModelValue;
-  type?: HTMLInputElement['type'];
+  options?: string[] | { [key: string]: any; disabled?: boolean }[];
   label?: string;
+  multiple?: boolean;
   leadingIcon?: `i-${string}`;
   trailingIcon?: `i-${string}`;
   color?: ColorOpts;
@@ -19,18 +20,21 @@ interface Props {
   placeholder?: string;
   disabled?: boolean;
   loading?: boolean;
+  searchable?: boolean;
   validationStatus?: Record<string, any>;
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
-  type: 'text',
+  options: () => [],
   label: '',
+  multiple: false,
   leadingIcon: undefined,
   trailingIcon: undefined,
   color: 'primary',
   variant: 'outline',
   size: 'md',
   placeholder: '',
+  searchable: true,
   validationStatus: () => ({}),
 });
 
@@ -74,22 +78,24 @@ const displayErrors = computed(
 </script>
 
 <template>
-  <div data-component="input">
+  <div data-component="select">
     <label v-if="label" :for="fieldId" class="text-xs inline-flex mb-1">{{
       label
     }}</label>
 
     <div class="relative pb-5">
-      <UInput
+      <USelectMenu
         :id="fieldId"
         v-model="value"
-        :type="type"
+        :options="options"
+        :multiple="multiple"
         :leading-icon="leadingIcon"
         :trailing-icon="suffixIcon"
         :color="fieldColor"
         :variant="variant"
         :size="size"
         :placeholder="placeholder"
+        :searchable="searchable"
         :disabled="disabled"
         :loading="loading"
         loading-icon="i-ic-outline-sync"
