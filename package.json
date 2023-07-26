@@ -26,6 +26,7 @@
     "eslint-plugin-vuejs-accessibility": "^2.1.0",
     "nuxt": "^3.6.0",
     "prettier": "^2.8.8",
-    "typescript": "latest"
+    "typescript": "latest",
+    "uid": "^2.0.2"
   }
 }

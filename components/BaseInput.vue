@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { uid } from 'uid';
 import type { ColorOpts, SizeOpts } from '@/types/base';
+
+const fieldId = `input_${uid()}`;
 
 type ModelValue = string | number | undefined;
 type InputVariant = 'outline' | 'none';
@@ -7,6 +10,7 @@ type InputVariant = 'outline' | 'none';
 interface Props {
   modelValue?: ModelValue;
   type?: HTMLInputElement['type'];
+  label?: string;
   leadingIcon?: `i-ic-${string}`;
   trailingIcon?: `i-ic-${string}`;
   color?: ColorOpts;
@@ -20,6 +24,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   type: 'text',
+  label: '',
   leadingIcon: undefined,
   trailingIcon: undefined,
   color: 'primary',
@@ -70,7 +75,11 @@ const displayErrors = computed(
 
 <template>
   <div data-component="input">
+    <label v-if="label" :for="fieldId" class="text-xs inline-flex mb-1">{{
+      label
+    }}</label>
     <UInput
+      :id="fieldId"
       v-model="value"
       :type="type"
       :leading-icon="leadingIcon"

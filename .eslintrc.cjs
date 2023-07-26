@@ -10,5 +10,17 @@ module.exports = {
     'plugin:vuejs-accessibility/recommended',
   ],
   plugins: ['vuejs-accessibility'],
-  rules: {},
+  rules: {
+    // a11y rules
+    'vuejs-accessibility/label-has-for': [
+      'error',
+      {
+        controlComponents: ['UInput'],
+        required: {
+          some: ['nesting', 'id'],
+        },
+        allowChildren: false,
+      },
+    ],
+  },
 };
