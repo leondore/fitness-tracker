@@ -4,12 +4,13 @@ import type { ColorOpts, SizeOpts } from '@/types';
 
 const fieldId = `select_${uid()}`;
 
-type ModelValue = string | number | Record<string, any> | undefined;
+type ModelValue = string | number | Record<string, any> | unknown[] | undefined;
 type InputVariant = 'outline' | 'none';
 
 interface Props {
   modelValue?: ModelValue;
   options?: string[] | { [key: string]: any; disabled?: boolean }[];
+  optionAttr?: string;
   label?: string;
   multiple?: boolean;
   leadingIcon?: `i-${string}`;
@@ -26,6 +27,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   options: () => [],
+  optionAttr: 'label',
   label: '',
   multiple: false,
   leadingIcon: undefined,
@@ -33,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
   color: 'primary',
   variant: 'outline',
   size: 'md',
-  placeholder: '',
+  placeholder: 'Select...',
   searchable: true,
   validationStatus: () => ({}),
 });
@@ -51,6 +53,28 @@ const value = computed({
   set(value) {
     emits('update:modelValue', value);
   },
+});
+
+const selected = computed(() => {
+  if (Array.isArray(props.modelValue)) {
+    return props.modelValue.map((selected) => selected[props.optionAttr]);
+  }
+
+  if (typeof props.modelValue === 'object') {
+    return props.modelValue[props.optionAttr];
+  }
+
+  return props.modelValue;
+});
+
+const isSelected = computed(() => {
+  if (typeof props.modelValue === 'number') return true;
+
+  if (Array.isArray(props.modelValue)) {
+    return props.modelValue.length > 0;
+  }
+
+  return !!props.modelValue;
 });
 
 const fieldColor = computed(() => {
@@ -88,6 +112,7 @@ const displayErrors = computed(
         :id="fieldId"
         v-model="value"
         :options="options"
+        :option-attribute="optionAttr"
         :multiple="multiple"
         :leading-icon="leadingIcon"
         :trailing-icon="suffixIcon"
@@ -101,7 +126,28 @@ const displayErrors = computed(
         loading-icon="i-ic-outline-sync"
         @change="emits('change', value)"
         @blur="emits('blur', value)"
-      />
+      >
+        <template #label>
+          <template v-if="isSelected">
+            <div v-if="multiple" class="flex items-center gap-1">
+              <UBadge
+                v-for="item in selected"
+                :key="`${fieldId}_${item}`"
+                color="gray"
+                size="xs"
+                >{{ item }}</UBadge
+              >
+            </div>
+            <div v-else>
+              <UBadge color="gray" size="xs">{{ selected }}</UBadge>
+            </div>
+          </template>
+
+          <template v-else>
+            <div class="text-gray-500">{{ placeholder }}</div>
+          </template>
+        </template>
+      </USelectMenu>
 
       <small
         v-if="displayErrors"

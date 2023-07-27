@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   ],
   ui: {
     icons: ['ic'],
-    safelistColors: ['indigo', 'red', 'green', 'orange', 'sky'],
+    safelistColors: ['indigo', 'red', 'green', 'orange', 'sky', 'gray'],
   },
   googleFonts: {
     families: {

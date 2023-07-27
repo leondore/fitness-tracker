@@ -28,21 +28,15 @@ const rules = computed(() => {
         required
       ),
     },
-    bodyparts: {
-      required: helpers.withMessage(
-        'You must select at least one muscle group',
-        required
-      ),
-    },
   };
 });
 const v$ = useVuelidate(rules, formData);
 
 const client = useSupabaseClient();
 const {
-  data: stagesOptions,
-  stagesPending,
-  stagesError,
+  data: stages,
+  pending: stagesPending,
+  error: stagesError,
 } = await useAsyncData(
   'stages',
   async () => {
@@ -52,10 +46,14 @@ const {
   },
   { lazy: true }
 );
+const stagesOptions = computed<Exercise['stages'] | undefined>(
+  () => stages.value || undefined
+);
+
 const {
   data: muscles,
-  musclesPending,
-  musclesError,
+  pending: musclesPending,
+  error: musclesError,
 } = await useAsyncData(
   'bodyparts',
   async () => {
@@ -117,16 +115,29 @@ function addExercise() {
       />
 
       <BaseSelect
+        v-if="!musclesError"
         v-model="formData.bodyparts"
-        label="Name"
-        multiple
+        label="Muscle Groups"
         size="lg"
+        multiple
         placeholder="Select a muscle group"
         class="col-span-1"
+        option-attr="name"
         :options="musclesOptions"
-        :validation-status="v$.bodyparts"
-        @change="v$.bodyparts.$touch"
-        @blur="v$.bodyparts.$touch"
+        :loading="musclesPending"
+      />
+
+      <BaseSelect
+        v-if="!stagesError"
+        v-model="formData.stages"
+        label="Routine Stages"
+        size="lg"
+        multiple
+        placeholder="Select applicable stages"
+        class="col-span-1"
+        option-attr="name"
+        :options="stagesOptions"
+        :loading="stagesPending"
       />
     </form>
   </div>
