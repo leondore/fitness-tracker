@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Database } from 'types/supabase';
+import type { AlertProps } from 'components/BaseAlert.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
@@ -16,9 +18,18 @@ const formData = reactive<Exercise>({
   description: '',
   stages: [],
   bodyparts: [],
-  video_url: '',
   image_url: '',
+  video_url: '',
 });
+
+function clearFormData() {
+  formData.name = '';
+  formData.description = '';
+  formData.stages = [];
+  formData.bodyparts = [];
+  formData.image_url = '';
+  formData.video_url = '';
+}
 
 const rules = computed(() => {
   return {
@@ -32,7 +43,7 @@ const rules = computed(() => {
 });
 const v$ = useVuelidate(rules, formData);
 
-const client = useSupabaseClient();
+const client = useSupabaseClient<Database>();
 const {
   data: stages,
   pending: stagesPending,
@@ -46,9 +57,7 @@ const {
   },
   { lazy: true }
 );
-const stagesOptions = computed<Exercise['stages'] | undefined>(
-  () => stages.value || undefined
-);
+const stagesOptions = computed(() => stages.value || undefined);
 
 const {
   data: muscles,
@@ -63,15 +72,74 @@ const {
   },
   { lazy: true }
 );
-const musclesOptions = computed<Exercise['bodyparts'] | undefined>(
-  () => muscles.value || undefined
-);
+const musclesOptions = computed(() => muscles.value || undefined);
 
-function addExercise() {
+const alert = reactive<AlertProps & { show: boolean }>({
+  name: 'exercises_new_alert',
+  show: false,
+  type: 'success',
+  message: '',
+});
+
+const loading = ref(false);
+async function addExercise() {
   v$.value.$validate();
   if (v$.value.$error) return;
 
-  console.log(formData);
+  loading.value = true;
+  try {
+    const { data, error } = await client
+      .from('exercises')
+      .insert({
+        name: formData.name,
+        slug: slugify(formData.name),
+        description: formData.description,
+        image_url: formData.image_url,
+        video_url: formData.video_url,
+      })
+      .select();
+
+    if (error) throw error;
+
+    const exerciseId = data[0].id;
+
+    const exercisesStages = formData.stages.map((stage) => ({
+      exercise_id: exerciseId,
+      stage_id: stage.id,
+    }));
+    const { error: esError } = await client
+      .from('exercises_stages')
+      .insert(exercisesStages);
+    if (esError) throw esError;
+
+    const exercisesBodyparts = formData.bodyparts.map((bodypart) => ({
+      exercise_id: exerciseId,
+      bodypart_id: bodypart.id,
+    }));
+    const { error: ebpError } = await client
+      .from('exercises_bodyparts')
+      .insert(exercisesBodyparts);
+    if (ebpError) throw ebpError;
+
+    if (data.length) {
+      alert.show = true;
+      alert.type = 'success';
+      alert.message = `Exercise: ${formData.name} was successfully created.`;
+    }
+    clearFormData();
+    v$.value.$reset();
+  } catch (error) {
+    let message = 'An error occurred while trying to save.';
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    alert.show = true;
+    alert.type = 'error';
+    alert.message = message;
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
 
@@ -91,8 +159,17 @@ function addExercise() {
       </UButton>
     </header>
 
+    <BaseAlert
+      v-if="alert.show"
+      class="mb-4"
+      :type="alert.type"
+      :name="alert.name"
+      :message="alert.message"
+      @close="alert.show = false"
+    />
+
     <form
-      class="grid grid-cols-2 gap-3 p-8 rounded-md border border-solid border-zinc-700 bg-zinc-950"
+      class="grid grid-cols-2 gap-4 p-8 rounded-md border border-solid border-zinc-700 bg-zinc-950"
       @submit.prevent="addExercise"
     >
       <BaseInput
@@ -100,7 +177,7 @@ function addExercise() {
         type="text"
         label="Name"
         size="lg"
-        placeholder="Enter a Name"
+        placeholder="Ex. Push-Ups"
         class="col-span-2"
         :validation-status="v$.name"
         @change="v$.name.$touch"
@@ -110,7 +187,7 @@ function addExercise() {
       <BaseTextarea
         v-model="formData.description"
         label="Description"
-        placeholder="Enter a Description"
+        placeholder="Push-ups are a classic and effective bodyweight exercise that targets the upper body, especially the chest, shoulders, and triceps."
         class="col-span-2"
       />
 
@@ -121,7 +198,7 @@ function addExercise() {
         size="lg"
         multiple
         placeholder="Select a muscle group"
-        class="col-span-1"
+        class="col-span-2 md:col-span-1"
         option-attr="name"
         :options="musclesOptions"
         :loading="musclesPending"
@@ -134,11 +211,41 @@ function addExercise() {
         size="lg"
         multiple
         placeholder="Select applicable stages"
-        class="col-span-1"
+        class="col-span-2 md:col-span-1"
         option-attr="name"
         :options="stagesOptions"
         :loading="stagesPending"
       />
+
+      <BaseInput
+        v-model="formData.image_url"
+        type="text"
+        label="Image URL"
+        size="lg"
+        placeholder="https://example.com/image.jpg"
+        class="col-span-2 md:col-span-1"
+      />
+
+      <BaseInput
+        v-model="formData.video_url"
+        type="text"
+        label="Video URL"
+        size="lg"
+        placeholder="https://www.youtube.com/watch?v=zkU6Ok44_CI"
+        class="col-span-2 md:col-span-1"
+      />
+
+      <UButton
+        type="submit"
+        color="indigo"
+        variant="solid"
+        size="md"
+        block
+        class="col-span-2 mt-2"
+        :loading="loading"
+      >
+        Add Exercise
+      </UButton>
     </form>
   </div>
 </template>

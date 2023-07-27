@@ -75,11 +75,11 @@ const displayErrors = computed(
 
 <template>
   <div data-component="input">
-    <label v-if="label" :for="fieldId" class="text-xs inline-flex mb-1">{{
+    <label v-if="label" :for="fieldId" class="text-xs inline-flex mb-1.5">{{
       label
     }}</label>
 
-    <div class="relative pb-5">
+    <div class="relative">
       <UInput
         :id="fieldId"
         v-model="value"
@@ -97,10 +97,7 @@ const displayErrors = computed(
         @blur="emits('blur', value)"
       />
 
-      <small
-        v-if="displayErrors"
-        class="block mt-1 text-xs text-red-500 absolute bottom-0"
-      >
+      <small v-if="displayErrors" class="block mt-1 text-xs text-red-500">
         {{ props.validationStatus.$errors[0].$message }}
       </small>
     </div>
