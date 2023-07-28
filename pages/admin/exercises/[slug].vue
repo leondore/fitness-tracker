@@ -4,6 +4,9 @@ import type { AlertProps } from 'components/BaseAlert.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 
+// ---- Component State ---- //
+const { params } = useRoute();
+
 interface Exercise {
   name: string;
   description: string;
@@ -12,7 +15,6 @@ interface Exercise {
   video_url: string;
   image_url: string;
 }
-
 const formData = reactive<Exercise>({
   name: '',
   description: '',
@@ -22,15 +24,18 @@ const formData = reactive<Exercise>({
   video_url: '',
 });
 
-function clearFormData() {
-  formData.name = '';
-  formData.description = '';
-  formData.stages = [];
-  formData.bodyparts = [];
-  formData.image_url = '';
-  formData.video_url = '';
-}
+const alert = reactive<AlertProps & { show: boolean }>({
+  name: 'exercises_new_alert',
+  show: false,
+  type: 'success',
+  message: '',
+});
 
+const saving = ref(false);
+const loading = ref(false);
+const client = useSupabaseClient<Database>();
+
+// ---- Form validation ---- //
 const rules = computed(() => {
   return {
     name: {
@@ -43,7 +48,17 @@ const rules = computed(() => {
 });
 const v$ = useVuelidate(rules, formData);
 
-const client = useSupabaseClient<Database>();
+// ---- Reset State ---- //
+function clearFormData() {
+  formData.name = '';
+  formData.description = '';
+  formData.stages = [];
+  formData.bodyparts = [];
+  formData.image_url = '';
+  formData.video_url = '';
+}
+
+// ---- Get Stages Select Options ---- //
 const {
   data: stages,
   pending: stagesPending,
@@ -51,7 +66,10 @@ const {
 } = await useAsyncData(
   'stages',
   async () => {
-    const { data, error } = await client.from('stages').select('id, name');
+    const { data, error } = await client
+      .from('stages')
+      .select('id, name')
+      .order('name');
     if (error) throw error;
     return data;
   },
@@ -59,6 +77,7 @@ const {
 );
 const stagesOptions = computed(() => stages.value || undefined);
 
+// ---- Get Muscles Group Select Options ---- //
 const {
   data: muscles,
   pending: musclesPending,
@@ -66,7 +85,10 @@ const {
 } = await useAsyncData(
   'bodyparts',
   async () => {
-    const { data, error } = await client.from('bodyparts').select('id, name');
+    const { data, error } = await client
+      .from('bodyparts')
+      .select('id, name')
+      .order('name');
     if (error) throw error;
     return data;
   },
@@ -74,14 +96,58 @@ const {
 );
 const musclesOptions = computed(() => muscles.value || undefined);
 
-const alert = reactive<AlertProps & { show: boolean }>({
-  name: 'exercises_new_alert',
-  show: false,
-  type: 'success',
-  message: '',
+// ---- Get Exercise Data ---- //
+async function getExercise(slug: string | string[]) {
+  loading.value = true;
+
+  try {
+    const { data, error } = await client
+      .from('exercises')
+      .select(
+        `
+        name,
+        description,
+        stages (
+          name
+        ),
+        bodyparts (
+          name
+        ),
+        image_url,
+        video_url
+      `
+      )
+      .eq('slug', slug);
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    let message = 'An error occurred while trying to load the data.';
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    alert.show = true;
+    alert.type = 'error';
+    alert.message = message;
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(() => {
+  watchEffect(async () => {
+    if (params.slug !== 'new') {
+      const data = await getExercise(params.slug);
+      if (data) {
+        Object.assign(formData, data[0]);
+      }
+    }
+  });
 });
 
-const loading = ref(false);
+// ---- Submission Function ---- //
 async function addExercise() {
   v$.value.$validate();
   if (v$.value.$error) return;
@@ -242,7 +308,7 @@ async function addExercise() {
         size="md"
         block
         class="col-span-2 mt-2"
-        :loading="loading"
+        :loading="saving"
       >
         Add Exercise
       </UButton>

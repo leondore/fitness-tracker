@@ -2,23 +2,33 @@
 const user = useSupabaseUser();
 const client = useSupabaseClient();
 
-const { data } = await useAsyncData('counts', async () => {
-  const { count: exercises } = await client
-    .from('exercises')
-    .select('*', { count: 'exact', head: true });
-  const { count: stages } = await client
-    .from('stages')
-    .select('*', { count: 'exact', head: true });
-  const { count: parts } = await client
-    .from('bodyparts')
-    .select('*', { count: 'exact', head: true });
+const { data } = await useAsyncData(
+  'counts',
+  async () => {
+    const exercisesQuery = client
+      .from('exercises')
+      .select('*', { count: 'exact', head: true });
+    const stagesQuery = client
+      .from('stages')
+      .select('*', { count: 'exact', head: true });
+    const partsQuery = client
+      .from('bodyparts')
+      .select('*', { count: 'exact', head: true });
 
-  return {
-    exercises,
-    stages,
-    parts,
-  };
-});
+    const [exercisesRes, stagesRes, partsRes] = await Promise.all([
+      exercisesQuery,
+      stagesQuery,
+      partsQuery,
+    ]);
+
+    return {
+      exercises: exercisesRes.count,
+      stages: stagesRes.count,
+      parts: partsRes.count,
+    };
+  },
+  { lazy: true }
+);
 </script>
 
 <template>

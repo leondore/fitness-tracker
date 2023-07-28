@@ -1,20 +1,30 @@
 <script setup lang="ts">
-import { AlertProps } from 'components/BaseAlert.vue';
+import type { Database } from 'types/supabase';
+import type { AlertProps } from 'components/BaseAlert.vue';
 
-const client = useSupabaseClient();
+const client = useSupabaseClient<Database>();
 const { data, pending } = await useAsyncData(
   'exercises',
   async () => {
-    const { data, error } = await client.from('exercises').select(`
+    const { data, error } = await client
+      .from('exercises')
+      .select(
+        `
       id,
       name,
+      slug,
       stages (
         name
       ),
       bodyparts (
         name
       )
-    `);
+    `
+      )
+      .order('name', { ascending: true })
+      .order('name', { foreignTable: 'bodyparts', ascending: true })
+      .order('name', { foreignTable: 'stages', ascending: true });
+
     if (error) {
       alert.message = error.message;
       alert.show = true;
@@ -27,10 +37,11 @@ const { data, pending } = await useAsyncData(
 interface Exercise {
   id: number;
   name: string;
+  slug: string;
   stages: { name: string }[];
   bodyparts: { name: string }[];
 }
-const rows = computed<Exercise[] | undefined>(() => data.value || undefined);
+const rows = computed(() => data.value || undefined);
 
 const alert = reactive<AlertProps & { show: boolean }>({
   name: 'exercises_alert',
@@ -63,7 +74,7 @@ const menuItems = (row: Exercise) => [
     {
       label: 'Edit',
       icon: 'i-heroicons-pencil-square-20-solid',
-      click: () => navigateTo(`/admin/exercises/${row.id}`),
+      click: () => navigateTo(`/admin/exercises/${row.slug}`),
     },
     {
       label: 'Delete',
