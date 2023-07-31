@@ -158,7 +158,7 @@ async function addExercise() {
   v$.value.$validate();
   if (v$.value.$error) return;
 
-  loading.value = true;
+  saving.value = true;
   try {
     const { data, error } = await client
       .from('exercises')
@@ -210,7 +210,7 @@ async function addExercise() {
     alert.type = 'error';
     alert.message = message;
   } finally {
-    loading.value = false;
+    saving.value = false;
   }
 }
 </script>

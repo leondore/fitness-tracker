@@ -85,11 +85,24 @@ const menuItems = (row: Exercise) => [
 ];
 
 async function deleteExercise(id: number) {
-  const { error } = await client.from('exercises').delete().eq('id', id);
+  try {
+    const { error } = await client.from('exercises').delete().eq('id', id);
 
-  if (error) {
-    alert.message = error.message;
+    if (error) throw error;
+
     alert.show = true;
+    alert.type = 'success';
+    alert.message = 'Exercise was deleted successfully.';
+    await refreshNuxtData();
+  } catch (error) {
+    let message = 'An error occurred while trying to delete.';
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    alert.show = true;
+    alert.type = 'error';
+    alert.message = message;
   }
 }
 </script>
