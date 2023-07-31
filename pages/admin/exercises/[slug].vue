@@ -35,6 +35,12 @@ const saving = ref(false);
 const loading = ref(false);
 const client = useSupabaseClient<Database>();
 
+const content = computed(() =>
+  params.slug === 'new'
+    ? { title: 'Add New Exercise', btn: 'Add Exercise' }
+    : { title: 'Edit Exercise', btn: 'Save Changes' }
+);
+
 // ---- Form validation ---- //
 const rules = computed(() => {
   return {
@@ -211,8 +217,10 @@ async function addExercise() {
 
 <template>
   <div>
+    <BaseLoader v-if="loading" :full-page="true" />
+
     <header class="flex item-center justify-between pb-6">
-      <h2 class="text-xl mb-0">Add New Exercise</h2>
+      <h2 class="text-xl mb-0">{{ content.title }}</h2>
       <UButton
         type="button"
         variant="solid"
@@ -310,7 +318,7 @@ async function addExercise() {
         class="col-span-2 mt-2"
         :loading="saving"
       >
-        Add Exercise
+        {{ content.btn }}
       </UButton>
     </form>
   </div>
