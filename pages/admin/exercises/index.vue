@@ -132,37 +132,39 @@ async function deleteExercise(id: number) {
       @close="alert.show = false"
     />
 
-    <UTable :loading="pending" :columns="columns" :rows="rows">
-      <template #stages-data="{ row }">
-        <div class="flex items-center gap-1.5">
-          <UBadge
-            v-for="(stage, index) in row.stages"
-            :key="`ex${row.id}_stage${index}`"
-            size="sm"
-            >{{ stage.name }}</UBadge
-          >
-        </div>
-      </template>
+    <div class="w-full overflow-x-auto">
+      <UTable :loading="pending" :columns="columns" :rows="rows">
+        <template #stages-data="{ row }">
+          <div class="flex items-center gap-1.5">
+            <UBadge
+              v-for="(stage, index) in row.stages"
+              :key="`ex${row.id}_stage${index}`"
+              size="sm"
+              >{{ stage.name }}</UBadge
+            >
+          </div>
+        </template>
 
-      <template #bodyparts-data="{ row }">
-        <div class="flex items-center gap-1.5">
-          <UBadge
-            v-for="(bodypart, index) in row.bodyparts"
-            :key="`ex${row.id}_bodypart${index}`"
-            size="sm"
-            >{{ bodypart.name }}</UBadge
-          >
-        </div>
-      </template>
+        <template #bodyparts-data="{ row }">
+          <div class="flex items-center gap-1.5">
+            <UBadge
+              v-for="(bodypart, index) in row.bodyparts"
+              :key="`ex${row.id}_bodypart${index}`"
+              size="sm"
+              >{{ bodypart.name }}</UBadge
+            >
+          </div>
+        </template>
 
-      <template #actions-data="{ row }">
-        <UDropdown :items="menuItems(row)">
-          <UButton
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
-          />
-        </UDropdown>
-      </template>
-    </UTable>
+        <template #actions-data="{ row }">
+          <UDropdown :items="menuItems(row)">
+            <UButton
+              variant="ghost"
+              icon="i-heroicons-ellipsis-horizontal-20-solid"
+            />
+          </UDropdown>
+        </template>
+      </UTable>
+    </div>
   </div>
 </template>

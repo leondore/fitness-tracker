@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
   ],
   ui: {
-    icons: ['ic'],
+    icons: ['ic', 'lucide', 'mdi'],
     safelistColors: ['indigo', 'red', 'green', 'orange', 'sky', 'gray'],
   },
   googleFonts: {

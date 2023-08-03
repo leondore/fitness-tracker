@@ -39,7 +39,7 @@ const { data } = await useAsyncData(
       Welcome Back {{ user?.user_metadata?.first_name || 'friend' }}!
     </h2>
 
-    <div class="grid grid-cols-3 gap-5">
+    <div class="grid lg:grid-cols-3 gap-5">
       <BaseCard
         title="Exercises"
         url="/admin/exercises"
@@ -59,7 +59,7 @@ const { data } = await useAsyncData(
       <BaseCard
         title="Muscle Groups"
         url="/admin/muscle-groups"
-        icon="i-ic-outline-person-search"
+        icon="i-mdi-arm-flex-outline"
       >
         View all ({{ data?.parts || 0 }})
       </BaseCard>

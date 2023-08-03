@@ -670,6 +670,20 @@
   dependencies:
     "@iconify/types" "*"
 
+"@iconify-json/lucide@^1.1.114":
+  version "1.1.114"
+  resolved "https://registry.yarnpkg.com/@iconify-json/lucide/-/lucide-1.1.114.tgz#bb5d1666eeb1586301456b5e57b589f1b40e47aa"
+  integrity sha512-bzOlkZJkGvjaLGDluwP6nLk/OfZuaKGOxA6LKwxZT+pOoGUCtBeosZUGpp8+PwRdmpKLnVycdt6YvKz9V8h3iA==
+  dependencies:
+    "@iconify/types" "*"
+
+"@iconify-json/mdi@^1.1.53":
+  version "1.1.53"
+  resolved "https://registry.yarnpkg.com/@iconify-json/mdi/-/mdi-1.1.53.tgz#633588d1d56780192c0dc55e9d92d976e6a5e6bf"
+  integrity sha512-qG72Tc9Bd4w7fha+kMEySVTbH4Obgb9xA1mQl+WReFhtZ3PjcVpIWLgZGTewuIfZY8RAbd8zfAqhZ7qEYZWrhg==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify/types@*", "@iconify/types@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@iconify/types/-/types-2.0.0.tgz#ab0e9ea681d6c8a1214f30cd741fe3a20cc57f57"
