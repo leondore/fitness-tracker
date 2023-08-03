@@ -8,6 +8,11 @@ export default defineNuxtConfig({
     '@nuxthq/ui',
     '@nuxtjs/supabase',
   ],
+  app: {
+    head: {
+      title: 'Fitness Tracker | NinjaLion',
+    },
+  },
   ui: {
     icons: ['ic', 'lucide', 'mdi'],
     safelistColors: ['indigo', 'red', 'green', 'orange', 'sky', 'gray'],
