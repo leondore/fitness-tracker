@@ -11,7 +11,7 @@ const toEdit = reactive({
 });
 
 const alert = reactive<AlertProps & { show: boolean }>({
-  name: 'stages_alert',
+  name: 'bodyparts_alert',
   show: false,
   type: 'success',
   message: '',
@@ -30,10 +30,10 @@ function clearFormData() {
 
 // ---- Get Stages Data ---- //
 const { data, pending, error } = await useAsyncData(
-  'stages',
+  'bodyparts',
   async () => {
     const { data, error } = await client
-      .from('stages')
+      .from('bodyparts')
       .select('id, name')
       .order('name');
 
@@ -53,16 +53,16 @@ const menuItems = (row: { id: number; name: string }) => [
     {
       label: 'Delete',
       icon: 'i-heroicons-trash-20-solid',
-      click: () => deleteStage(row.id),
+      click: () => deleteBodyPart(row.id),
     },
   ],
 ];
 
-async function addStage() {
+async function addBodyPart() {
   saving.value = true;
 
   try {
-    const { error } = await client.from('stages').insert({
+    const { error } = await client.from('bodyparts').insert({
       name: newItem.name,
       slug: slugify(newItem.name),
     });
@@ -71,7 +71,7 @@ async function addStage() {
 
     alert.show = true;
     alert.type = 'success';
-    alert.message = 'Routine stage was added successfully.';
+    alert.message = 'Muscle group was added successfully.';
 
     clearFormData();
     await refreshNuxtData();
@@ -89,12 +89,12 @@ async function addStage() {
   }
 }
 
-async function editStage() {
+async function editBodyPart() {
   saving.value = true;
 
   try {
     const { error } = await client
-      .from('stages')
+      .from('bodyparts')
       .update({
         name: toEdit.name,
         slug: slugify(newItem.name),
@@ -105,7 +105,7 @@ async function editStage() {
 
     alert.show = true;
     alert.type = 'success';
-    alert.message = 'Routine stage was updated successfully.';
+    alert.message = 'Muscle group was updated successfully.';
 
     clearFormData();
     await refreshNuxtData();
@@ -123,15 +123,15 @@ async function editStage() {
   }
 }
 
-async function deleteStage(id: number) {
+async function deleteBodyPart(id: number) {
   try {
-    const { error } = await client.from('stages').delete().eq('id', id);
+    const { error } = await client.from('bodyparts').delete().eq('id', id);
 
     if (error) throw error;
 
     alert.show = true;
     alert.type = 'success';
-    alert.message = 'Routine stage was deleted successfully.';
+    alert.message = 'Muscle group was deleted successfully.';
     await refreshNuxtData();
   } catch (error) {
     let message = 'An error occurred while trying to delete.';
@@ -149,7 +149,7 @@ async function deleteStage(id: number) {
 <template>
   <div>
     <header class="flex item-center justify-between pb-6">
-      <h2 class="text-xl mb-0">Routine Stages</h2>
+      <h2 class="text-xl mb-0">Muscle Groups</h2>
       <UButton
         type="button"
         variant="solid"
@@ -189,7 +189,7 @@ async function deleteStage(id: number) {
         size="md"
         class="w-32 basis-32 flex-shrink-0 flex-grow-0 justify-center"
         :loading="saving"
-        @click="addStage"
+        @click="addBodyPart"
       >
         Add New
       </UButton>
@@ -204,12 +204,12 @@ async function deleteStage(id: number) {
 
       <template v-else>
         <div
-          v-for="stage in data"
-          :key="`stage${stage.id}`"
+          v-for="part in data"
+          :key="`part${part.id}`"
           class="flex items-center justify-between p-2 border-b border-gray-600"
         >
           <div>
-            <div v-if="toEdit.id === stage.id" class="flex items-center gap-2">
+            <div v-if="toEdit.id === part.id" class="flex items-center gap-2">
               <BaseInput v-model="toEdit.name" type="text" size="sm" />
               <UButton
                 color="indigo"
@@ -218,14 +218,14 @@ async function deleteStage(id: number) {
                 size="sm"
                 square
                 :loading="saving"
-                @click="editStage"
+                @click="editBodyPart"
               />
             </div>
 
-            <UBadge v-else size="sm">{{ stage.name }}</UBadge>
+            <UBadge v-else size="sm">{{ part.name }}</UBadge>
           </div>
 
-          <UDropdown :items="menuItems(stage)">
+          <UDropdown :items="menuItems(part)">
             <UButton
               variant="ghost"
               icon="i-heroicons-ellipsis-horizontal-20-solid"

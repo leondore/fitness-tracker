@@ -57,8 +57,8 @@ const { data } = await useAsyncData(
       </BaseCard>
 
       <BaseCard
-        title="Body Parts"
-        url="/admin/parts"
+        title="Muscle Groups"
+        url="/admin/muscle-groups"
         icon="i-ic-outline-person-search"
       >
         View all ({{ data?.parts || 0 }})

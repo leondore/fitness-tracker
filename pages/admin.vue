@@ -17,8 +17,8 @@ const adminMenu = [
     label: 'Stages',
   },
   {
-    to: '/admin/parts',
-    label: 'Body Parts',
+    to: '/admin/muscle-groups',
+    label: 'Muscle Groups',
   },
 ];
 
