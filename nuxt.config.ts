@@ -6,7 +6,6 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/google-fonts',
     '@nuxthq/ui',
-    '@nuxtjs/supabase',
   ],
   app: {
     head: {

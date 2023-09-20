@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { Database } from 'types/supabase';
 import type { AlertProps } from 'components/BaseAlert.vue';
 
-const client = useSupabaseClient<Database>();
+const client = useSupabaseClient();
 const { data, pending } = await useAsyncData(
   'exercises',
   async () => {

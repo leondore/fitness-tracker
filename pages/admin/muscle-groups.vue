@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Database } from 'types/supabase';
 import type { AlertProps } from 'components/BaseAlert.vue';
 
 // ---- Component State ---- //
@@ -18,7 +17,7 @@ const alert = reactive<AlertProps & { show: boolean }>({
 });
 
 const saving = ref(false);
-const client = useSupabaseClient<Database>();
+const client = useSupabaseClient();
 
 // ---- Reset State ---- //
 function clearFormData() {

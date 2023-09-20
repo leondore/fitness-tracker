@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Database } from 'types/supabase';
 import type { AlertProps } from 'components/BaseAlert.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
@@ -33,7 +32,7 @@ const alert = reactive<AlertProps & { show: boolean }>({
 
 const saving = ref(false);
 const loading = ref(false);
-const client = useSupabaseClient<Database>();
+const client = useSupabaseClient();
 
 const content = computed(() =>
   params.slug === 'new'

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { Database } from 'types/supabase';
-
 const user = useSupabaseUser();
-const client = useSupabaseClient<Database>();
+const client = useSupabaseClient();
 
 const { data } = await useAsyncData(
   'counts',
