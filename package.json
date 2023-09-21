@@ -18,9 +18,11 @@
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
     "@nuxtjs/eslint-module": "^4.1.0",
     "@nuxtjs/google-fonts": "^3.0.1",
+    "@types/better-sqlite3": "^7.6.5",
     "@types/node": "^18",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.3",
+    "drizzle-kit": "^0.19.13",
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -30,5 +32,10 @@
     "typescript": "latest",
     "uid": "^2.0.2",
     "vue-loading-overlay": "^6.0"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.3.4",
+    "better-sqlite3": "^8.6.0",
+    "drizzle-orm": "^0.28.6"
   }
 }

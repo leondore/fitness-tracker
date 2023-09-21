@@ -1,5 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { createResolver } from 'nuxt/kit';
+const { resolve } = createResolver(import.meta.url);
+
 export default defineNuxtConfig({
+  runtimeConfig: {
+    databaseUrl: '',
+    databaseAuthToken: '',
+    dbDir: resolve('db'),
+  },
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/eslint-module',
