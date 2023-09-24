@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { AlertProps } from 'components/BaseAlert.vue';
+import { db } from '@/server/utils/db';
+import { users, type User } from '@/db/schema';
 
 // ---- Component State ---- //
 const showNew = ref(false);
@@ -17,7 +19,6 @@ const alert = reactive<AlertProps & { show: boolean }>({
 });
 
 const saving = ref(false);
-const client = useSupabaseClient();
 
 // ---- Reset State ---- //
 function clearFormData() {
@@ -31,13 +32,9 @@ function clearFormData() {
 const { data, pending, error } = await useAsyncData(
   'stages',
   async () => {
-    const { data, error } = await client
-      .from('stages')
-      .select('id, name')
-      .order('name');
-
-    if (error) throw error;
-    return data;
+    const results = await db
+      .select({ id: users.id, email: users.email })
+      .from(users);
   },
   { lazy: true }
 );

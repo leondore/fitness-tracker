@@ -5,6 +5,9 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "migrate": "drizzle-kit generate:sqlite",
+    "push:dev": "tsx db/migrate.dev.ts",
+    "push:prod": "tsx db/migrate.prod.ts",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
@@ -29,6 +32,7 @@
     "eslint-plugin-vuejs-accessibility": "^2.1.0",
     "nuxt": "^3.6.0",
     "prettier": "^2.8.8",
+    "ts-node": "^10.9.1",
     "typescript": "latest",
     "uid": "^2.0.2",
     "vue-loading-overlay": "^6.0"
@@ -36,6 +40,7 @@
   "dependencies": {
     "@libsql/client": "^0.3.4",
     "better-sqlite3": "^8.6.0",
-    "drizzle-orm": "^0.28.6"
+    "drizzle-orm": "^0.28.6",
+    "drizzle-zod": "^0.5.1"
   }
 }

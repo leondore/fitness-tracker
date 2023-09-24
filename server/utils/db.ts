@@ -8,7 +8,9 @@ import {
   type BetterSQLite3Database,
   drizzle as drizzleBetterSQLite3,
 } from 'drizzle-orm/better-sqlite3';
-import * as Database from 'better-sqlite3';
+// @ts-ignore
+// eslint-disable-next-line import/no-named-as-default
+import Database from 'better-sqlite3';
 
 const config = useRuntimeConfig();
 
