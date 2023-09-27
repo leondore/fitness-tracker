@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     databaseUrl: '',
     databaseAuthToken: '',
+    superAdmin: '',
     dbDir: resolve('db'),
   },
   devtools: { enabled: true },
@@ -13,6 +14,7 @@ export default defineNuxtConfig({
     '@nuxtjs/eslint-module',
     '@nuxt/image',
     '@nuxtjs/google-fonts',
+    '@nuxtjs/supabase',
     '@nuxthq/ui',
   ],
   app: {
@@ -27,8 +29,11 @@ export default defineNuxtConfig({
   googleFonts: {
     families: {
       Poppins: [300, 400, 500, 600],
-      display: 'swap',
-      prefetch: true,
     },
+    display: 'swap',
+    prefetch: true,
+  },
+  supabase: {
+    redirect: false,
   },
 });

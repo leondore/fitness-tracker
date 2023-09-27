@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { AlertProps } from 'components/BaseAlert.vue';
 import { useVuelidate } from '@vuelidate/core';
 import {
   required,
@@ -8,6 +7,7 @@ import {
   minLength,
   helpers,
 } from '@vuelidate/validators';
+import type { AlertProps } from '@/components/BaseAlert.vue';
 
 const formData = reactive({
   first_name: '',
