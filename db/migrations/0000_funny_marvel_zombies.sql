@@ -1,7 +1,7 @@
 CREATE TABLE `exercises` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` text DEFAULT CURRENT_TIMESTAMP,
+	`created_at` integer DEFAULT (cast (unixepoch () as int)),
+	`updated_at` integer DEFAULT (cast (unixepoch () as int)),
 	`name` text NOT NULL,
 	`slug` text NOT NULL,
 	`description` text,
@@ -27,22 +27,9 @@ CREATE TABLE `exercises_stages` (
 --> statement-breakpoint
 CREATE TABLE `musclegroups` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` text DEFAULT CURRENT_TIMESTAMP,
+	`created_at` integer DEFAULT (cast (unixepoch () as int)),
+	`updated_at` integer DEFAULT (cast (unixepoch () as int)),
 	`name` text NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE `profiles` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` text DEFAULT CURRENT_TIMESTAMP,
-	`user_id` integer,
-	`first_name` text NOT NULL,
-	`last_name` text,
-	`phone` text,
-	`avatar_url` text,
-	`bio` text,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `roles` (
@@ -52,21 +39,31 @@ CREATE TABLE `roles` (
 --> statement-breakpoint
 CREATE TABLE `stages` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` text DEFAULT CURRENT_TIMESTAMP,
+	`created_at` integer DEFAULT (cast (unixepoch () as int)),
+	`updated_at` integer DEFAULT (cast (unixepoch () as int)),
 	`name` text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `users` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP,
-	`updated_at` text DEFAULT CURRENT_TIMESTAMP,
+	`id` text PRIMARY KEY NOT NULL,
+	`created_at` integer DEFAULT (cast (unixepoch () as int)),
+	`updated_at` integer DEFAULT (cast (unixepoch () as int)),
 	`email` text NOT NULL,
-	`password` text NOT NULL,
-	`role_id` integer,
+	`first_name` text NOT NULL,
+	`last_name` text,
+	`phone` text,
+	`avatar_url` text,
+	`role_id` integer NOT NULL,
 	FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `exercises_slug_unique` ON `exercises` (`slug`);--> statement-breakpoint
+CREATE UNIQUE INDEX `exercise_slug_idx` ON `exercises` (`slug`);--> statement-breakpoint
+CREATE INDEX `exercise_name_idx` ON `exercises` (`name`);--> statement-breakpoint
+CREATE INDEX `musclegroups_name_idx` ON `musclegroups` (`name`);--> statement-breakpoint
 CREATE UNIQUE INDEX `roles_role_unique` ON `roles` (`role`);--> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
+CREATE UNIQUE INDEX `role_idx` ON `roles` (`role`);--> statement-breakpoint
+CREATE INDEX `stages_name_idx` ON `stages` (`name`);--> statement-breakpoint
+CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);--> statement-breakpoint
+CREATE UNIQUE INDEX `email_idx` ON `users` (`email`);--> statement-breakpoint
+CREATE INDEX `first_name_last_name_idx` ON `users` (`first_name`,`last_name`);
