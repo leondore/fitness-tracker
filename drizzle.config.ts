@@ -3,19 +3,13 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const isProd = process.env.NODE_ENV === 'production';
-const driver = isProd ? 'turso' : 'better-sqlite';
-const url = isProd
-  ? (process.env.NUXT_DATABASE_URL as string)
-  : './db/db.sqlite';
-const authToken = isProd
-  ? (process.env.NUXT_DATABASE_AUTH_TOKEN as string)
-  : undefined;
+const url = process.env.NUXT_DATABASE_URL as string;
+const authToken = process.env.NUXT_DATABASE_AUTH_TOKEN as string;
 
 export default {
   schema: './db/schema.ts',
   out: './db/migrations',
-  driver,
+  driver: 'turso',
   dbCredentials: {
     url,
     authToken,

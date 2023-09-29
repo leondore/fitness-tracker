@@ -7,6 +7,8 @@ export default defineNuxtConfig({
     databaseUrl: '',
     databaseAuthToken: '',
     superAdmin: '',
+    accessToken: '',
+    jwtSecret: '',
     dbDir: resolve('db'),
   },
   devtools: { enabled: true },

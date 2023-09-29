@@ -41,13 +41,14 @@ const login = async () => {
 
   loading.value = true;
   try {
-    const { error } = await client.auth.signInWithPassword({
+    const { data, error } = await client.auth.signInWithPassword({
       email: formData.email,
       password: formData.password,
     });
 
     if (error) throw error;
 
+    console.log(data);
     clearFormData();
     v$.value.$reset();
   } catch (error) {

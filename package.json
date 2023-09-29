@@ -7,8 +7,7 @@
     "generate": "nuxt generate",
     "migrate": "drizzle-kit generate:sqlite",
     "drop": "drizzle-kit drop",
-    "push:dev": "tsx db/migrate.dev.ts",
-    "push:prod": "tsx db/migrate.prod.ts",
+    "push": "tsx db/migrate.ts",
     "studio": "drizzle-kit studio --port 3333",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
