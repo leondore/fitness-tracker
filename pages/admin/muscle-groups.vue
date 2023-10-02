@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { AlertProps } from 'components/BaseAlert.vue';
+import type { AlertProps } from '@/components/BaseAlert.vue';
+import type { MuscleGroups } from '~/db/schema';
 
 // ---- Component State ---- //
 const showNew = ref(false);
@@ -28,18 +29,12 @@ function clearFormData() {
 }
 
 // ---- Get Stages Data ---- //
-const { data, pending, error } = await useAsyncData(
-  'bodyparts',
-  async () => {
-    const { data, error } = await client
-      .from('bodyparts')
-      .select('id, name')
-      .order('name');
-
-    if (error) throw error;
-    return data;
-  },
-  { lazy: true }
+type PartialMuscleGroups = Pick<MuscleGroups, 'id' | 'name'>;
+const { data, pending, error } = await useFetch<PartialMuscleGroups[]>(
+  '/api/muscle-groups',
+  {
+    lazy: true,
+  }
 );
 
 const menuItems = (row: { id: number; name: string }) => [

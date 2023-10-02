@@ -10,16 +10,16 @@ import {
 import type { AlertProps } from '@/components/BaseAlert.vue';
 
 const formData = reactive({
-  first_name: '',
-  last_name: '',
+  firstName: '',
+  lastName: '',
   email: '',
   password: '',
   confirm_password: '',
 });
 
 function clearFormData() {
-  formData.first_name = '';
-  formData.last_name = '';
+  formData.firstName = '';
+  formData.lastName = '';
   formData.email = '';
   formData.password = '';
   formData.confirm_password = '';
@@ -27,7 +27,7 @@ function clearFormData() {
 
 const rules = computed(() => {
   return {
-    first_name: {
+    firstName: {
       required: helpers.withMessage(
         'The first name field is required',
         required
@@ -66,7 +66,6 @@ const alert = reactive<AlertProps & { show: boolean }>({
 });
 
 const loading = ref(false);
-const client = useSupabaseClient();
 const signUp = async () => {
   v$.value.$validate();
   if (v$.value.$error) return;
@@ -74,22 +73,12 @@ const signUp = async () => {
   loading.value = true;
 
   try {
-    const { data, error } = await client.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: {
-        data: {
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-        },
-      },
+    const user = await $fetch('/api/signup', {
+      method: 'POST',
+      body: formData,
     });
 
-    if (error) {
-      throw error;
-    }
-
-    if (data.user) {
+    if (user) {
       alert.show = true;
       alert.type = 'success';
       alert.message =
@@ -129,17 +118,17 @@ const signUp = async () => {
     >
       <div class="grid grid-cols-2 gap-3 mb-3">
         <BaseInput
-          v-model="formData.first_name"
+          v-model="formData.firstName"
           leading-icon="i-ic-outline-person"
           size="lg"
           placeholder="First Name"
-          :validation-status="v$.first_name"
-          @change="v$.first_name.$touch"
-          @blur="v$.first_name.$touch"
+          :validation-status="v$.firstName"
+          @change="v$.firstName.$touch"
+          @blur="v$.firstName.$touch"
         />
 
         <BaseInput
-          v-model="formData.last_name"
+          v-model="formData.lastName"
           leading-icon="i-ic-outline-person"
           size="lg"
           placeholder="Last Name"

@@ -1,4 +1,5 @@
 import { db } from '../utils/db';
+import { handleError } from '../utils/helpers';
 import { users } from '~/db/schema';
 import { Role } from '~/types/auth';
 import { serverSupabaseServiceRole } from '#supabase/server';
@@ -14,6 +15,7 @@ interface SignUpBody {
 export default defineEventHandler(async (event) => {
   const { email, password, firstName, lastName, phone } =
     await readBody<SignUpBody>(event);
+
   const client = serverSupabaseServiceRole(event);
 
   const { data, error } = await client.auth.admin.createUser({
@@ -24,6 +26,7 @@ export default defineEventHandler(async (event) => {
       last_name: lastName,
       phone,
     },
+    email_confirm: true,
   });
 
   if (error) {
@@ -46,11 +49,11 @@ export default defineEventHandler(async (event) => {
       phone,
       roleId: Role.Member,
     });
+
+    setResponseStatus(event, 201, 'User created');
+    return data.user;
   } catch (err) {
-    const { error } = await client.auth.admin.deleteUser(data.user.id);
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-    });
+    await client.auth.admin.deleteUser(data.user.id);
+    handleError(err);
   }
 });
