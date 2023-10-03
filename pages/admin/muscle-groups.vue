@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type { AlertProps } from '@/components/BaseAlert.vue';
 import type { MuscleGroups } from '~/db/schema';
+import { useAlert } from '@/composables/alert';
+
+const { alert, showAlert } = useAlert('bodyparts_alert');
 
 // ---- Component State ---- //
 const showNew = ref(false);
@@ -10,15 +12,7 @@ const toEdit = reactive({
   name: '',
 });
 
-const alert = reactive<AlertProps & { show: boolean }>({
-  name: 'bodyparts_alert',
-  show: false,
-  type: 'success',
-  message: '',
-});
-
 const saving = ref(false);
-const client = useSupabaseClient();
 
 // ---- Reset State ---- //
 function clearFormData() {
@@ -56,16 +50,15 @@ async function addBodyPart() {
   saving.value = true;
 
   try {
-    const { error } = await client.from('bodyparts').insert({
-      name: newItem.name,
-      slug: slugify(newItem.name),
+    const createdItem = await $fetch('/api/muscle-groups', {
+      method: 'POST',
+      body: { name: newItem.name },
     });
 
-    if (error) throw error;
-
-    alert.show = true;
-    alert.type = 'success';
-    alert.message = 'Muscle group was added successfully.';
+    showAlert({
+      type: 'success',
+      message: `Muscle group: ${createdItem[0]?.name} was added successfully.`,
+    });
 
     clearFormData();
     await refreshNuxtData();
@@ -75,9 +68,10 @@ async function addBodyPart() {
       message = error.message;
     }
 
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+    showAlert({
+      type: 'error',
+      message,
+    });
   } finally {
     saving.value = false;
   }
@@ -87,19 +81,15 @@ async function editBodyPart() {
   saving.value = true;
 
   try {
-    const { error } = await client
-      .from('bodyparts')
-      .update({
-        name: toEdit.name,
-        slug: slugify(newItem.name),
-      })
-      .eq('id', toEdit.id);
+    const updatedItem = await $fetch('/api/muscle-groups', {
+      method: 'PUT',
+      body: { name: toEdit.name, id: toEdit.id },
+    });
 
-    if (error) throw error;
-
-    alert.show = true;
-    alert.type = 'success';
-    alert.message = 'Muscle group was updated successfully.';
+    showAlert({
+      type: 'success',
+      message: `Muscle group: ${updatedItem[0]?.name} was updated successfully.`,
+    });
 
     clearFormData();
     await refreshNuxtData();
@@ -109,9 +99,10 @@ async function editBodyPart() {
       message = error.message;
     }
 
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+    showAlert({
+      type: 'error',
+      message,
+    });
   } finally {
     saving.value = false;
   }
@@ -119,13 +110,15 @@ async function editBodyPart() {
 
 async function deleteBodyPart(id: number) {
   try {
-    const { error } = await client.from('bodyparts').delete().eq('id', id);
+    const deletedItem = await $fetch('/api/muscle-groups', {
+      method: 'DELETE',
+      body: { id },
+    });
 
-    if (error) throw error;
-
-    alert.show = true;
-    alert.type = 'success';
-    alert.message = 'Muscle group was deleted successfully.';
+    showAlert({
+      type: 'success',
+      message: `Muscle group: ${deletedItem[0]?.name} was deleted successfully.`,
+    });
     await refreshNuxtData();
   } catch (error) {
     let message = 'An error occurred while trying to delete.';
@@ -133,9 +126,10 @@ async function deleteBodyPart(id: number) {
       message = error.message;
     }
 
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+    showAlert({
+      type: 'error',
+      message,
+    });
   }
 }
 </script>
