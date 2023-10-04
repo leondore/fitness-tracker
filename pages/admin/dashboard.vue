@@ -1,34 +1,15 @@
 <script setup lang="ts">
 const user = useSupabaseUser();
-const client = useSupabaseClient();
 
-const { data } = await useAsyncData(
-  'counts',
-  async () => {
-    const exercisesQuery = client
-      .from('exercises')
-      .select('*', { count: 'exact', head: true });
-    const stagesQuery = client
-      .from('stages')
-      .select('*', { count: 'exact', head: true });
-    const partsQuery = client
-      .from('bodyparts')
-      .select('*', { count: 'exact', head: true });
+interface Counts {
+  exercises: number;
+  stages: number;
+  musclegroups: number;
+}
 
-    const [exercisesRes, stagesRes, partsRes] = await Promise.all([
-      exercisesQuery,
-      stagesQuery,
-      partsQuery,
-    ]);
-
-    return {
-      exercises: exercisesRes.count,
-      stages: stagesRes.count,
-      parts: partsRes.count,
-    };
-  },
-  { lazy: true }
-);
+const { data } = await useFetch<Counts>('/api/dashboard', {
+  lazy: true,
+});
 </script>
 
 <template>
@@ -59,7 +40,7 @@ const { data } = await useAsyncData(
         url="/admin/muscle-groups"
         icon="i-mdi-arm-flex-outline"
       >
-        View all ({{ data?.parts || 0 }})
+        View all ({{ data?.musclegroups || 0 }})
       </BaseCard>
     </div>
   </div>
