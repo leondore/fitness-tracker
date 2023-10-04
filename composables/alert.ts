@@ -1,10 +1,5 @@
 import type { AlertProps } from '@/components/BaseAlert.vue';
 
-interface AlertParams {
-  message: string;
-  type?: AlertProps['type'];
-}
-
 export function useAlert(name: string) {
   const alert = reactive<AlertProps & { show: boolean }>({
     name,
@@ -13,10 +8,10 @@ export function useAlert(name: string) {
     message: '',
   });
 
-  function showAlert(options: AlertParams) {
+  function showAlert(message: string, type: AlertProps['type'] = 'success') {
     alert.show = true;
-    alert.message = options.message;
-    alert.type = options.type;
+    alert.message = message;
+    alert.type = type;
   }
 
   return { alert, showAlert };

@@ -7,11 +7,11 @@ export default defineEventHandler(async (event) => {
   const { id, name } = await readBody<MuscleGroups>(event);
 
   try {
-    const updated: Partial<MuscleGroups>[] = await db
+    const updated: MuscleGroups[] = await db
       .update(muscleGroups)
       .set({ name })
       .where(eq(muscleGroups.id, id))
-      .returning({ id: muscleGroups.id, name: muscleGroups.name });
+      .returning();
 
     setResponseStatus(event, 200, 'OK');
     return updated;

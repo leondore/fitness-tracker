@@ -6,12 +6,12 @@ export default defineEventHandler(async (event) => {
   const { name } = await readBody<MuscleGroups>(event);
 
   try {
-    const created: Partial<MuscleGroups>[] = await db
+    const created: MuscleGroups[] = await db
       .insert(muscleGroups)
       .values({
         name,
       })
-      .returning({ name: muscleGroups.name });
+      .returning();
 
     setResponseStatus(event, 201, 'Created');
     return created;

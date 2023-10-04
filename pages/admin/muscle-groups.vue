@@ -22,15 +22,6 @@ function clearFormData() {
   showNew.value = false;
 }
 
-// ---- Get Stages Data ---- //
-type PartialMuscleGroups = Pick<MuscleGroups, 'id' | 'name'>;
-const { data, pending, error } = await useFetch<PartialMuscleGroups[]>(
-  '/api/muscle-groups',
-  {
-    lazy: true,
-  }
-);
-
 const menuItems = (row: { id: number; name: string }) => [
   [
     {
@@ -41,95 +32,98 @@ const menuItems = (row: { id: number; name: string }) => [
     {
       label: 'Delete',
       icon: 'i-heroicons-trash-20-solid',
-      click: () => deleteBodyPart(row.id),
+      click: () => remove(row.id),
     },
   ],
 ];
 
-async function addBodyPart() {
+function handleError(error: unknown, defaultMessage = '') {
+  let message = defaultMessage;
+  if (error instanceof Error) {
+    message = error.message;
+  }
+
+  showAlert(message, 'error');
+}
+
+// ---- Get Stages Data ---- //
+type PartialMuscleGroups = Pick<MuscleGroups, 'id' | 'name'>;
+const {
+  data: musclegroups,
+  pending,
+  error,
+} = await useFetch<PartialMuscleGroups[]>('/api/muscle-groups', {
+  lazy: true,
+});
+
+async function add() {
   saving.value = true;
 
   try {
-    const createdItem = await $fetch('/api/muscle-groups', {
+    const [createdItem] = await $fetch('/api/muscle-groups', {
       method: 'POST',
       body: { name: newItem.name },
     });
 
-    showAlert({
-      type: 'success',
-      message: `Muscle group: ${createdItem[0]?.name} was added successfully.`,
-    });
+    showAlert(`Muscle group: ${createdItem?.name} was added successfully.`);
 
     clearFormData();
-    await refreshNuxtData();
-  } catch (error) {
-    let message = 'An error occurred while trying to save.';
-    if (error instanceof Error) {
-      message = error.message;
+    if (musclegroups.value) {
+      musclegroups.value.push(createdItem);
+      musclegroups.value.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      await refreshNuxtData();
     }
-
-    showAlert({
-      type: 'error',
-      message,
-    });
+  } catch (error) {
+    handleError(error, 'An error occurred while trying to save.');
   } finally {
     saving.value = false;
   }
 }
 
-async function editBodyPart() {
+async function edit() {
   saving.value = true;
 
   try {
-    const updatedItem = await $fetch('/api/muscle-groups', {
+    const [updatedItem] = await $fetch('/api/muscle-groups', {
       method: 'PUT',
       body: { name: toEdit.name, id: toEdit.id },
     });
 
-    showAlert({
-      type: 'success',
-      message: `Muscle group: ${updatedItem[0]?.name} was updated successfully.`,
-    });
+    showAlert(`Muscle group: ${updatedItem?.name} was updated successfully.`);
 
     clearFormData();
-    await refreshNuxtData();
-  } catch (error) {
-    let message = 'An error occurred while trying to save.';
-    if (error instanceof Error) {
-      message = error.message;
+    if (musclegroups.value) {
+      musclegroups.value?.splice(
+        musclegroups.value?.findIndex((item) => item.id === updatedItem.id),
+        1,
+        updatedItem
+      );
+    } else {
+      await refreshNuxtData();
     }
-
-    showAlert({
-      type: 'error',
-      message,
-    });
+  } catch (error) {
+    handleError(error, 'An error occurred while trying to save.');
   } finally {
     saving.value = false;
   }
 }
 
-async function deleteBodyPart(id: number) {
+async function remove(id: number) {
   try {
-    const deletedItem = await $fetch('/api/muscle-groups', {
+    const [deletedItem] = await $fetch('/api/muscle-groups', {
       method: 'DELETE',
       body: { id },
     });
 
-    showAlert({
-      type: 'success',
-      message: `Muscle group: ${deletedItem[0]?.name} was deleted successfully.`,
-    });
-    await refreshNuxtData();
-  } catch (error) {
-    let message = 'An error occurred while trying to delete.';
-    if (error instanceof Error) {
-      message = error.message;
+    showAlert(`Muscle group: ${deletedItem?.name} was deleted successfully.`);
+    if (musclegroups.value) {
+      musclegroups.value.filter((item) => item.id !== deletedItem?.id);
+    } else {
+      await refreshNuxtData();
     }
-
-    showAlert({
-      type: 'error',
-      message,
-    });
+  } catch (error) {
+    handleError(error, 'An error occurred while trying to delete.');
   }
 }
 </script>
@@ -162,22 +156,23 @@ async function deleteBodyPart(id: number) {
       @close="alert.show = false"
     />
 
-    <div v-if="showNew" class="flex item-center gap-2 pb-5 pt-3">
+    <div v-if="showNew" class="relative pb-5 pt-3">
       <BaseInput
         v-model="newItem.name"
         type="text"
         size="md"
         placeholder="Enter a Name"
-        class="flex-auto"
+        class="w-full"
       />
       <UButton
         color="indigo"
         variant="solid"
         icon="i-ic-outline-save"
-        size="md"
-        class="w-32 basis-32 flex-shrink-0 flex-grow-0 justify-center"
+        size="2xs"
+        class="absolute top-[18px] right-1.5"
+        :disabled="!newItem.name"
         :loading="saving"
-        @click="addBodyPart"
+        @click="add"
       >
         Add New
       </UButton>
@@ -192,12 +187,12 @@ async function deleteBodyPart(id: number) {
 
       <template v-else>
         <div
-          v-for="part in data"
-          :key="`part${part.id}`"
+          v-for="item in musclegroups"
+          :key="`muscle_${item.id}`"
           class="flex items-center justify-between p-2 border-b border-gray-600"
         >
           <div>
-            <div v-if="toEdit.id === part.id" class="flex items-center gap-2">
+            <div v-if="toEdit.id === item.id" class="flex items-center gap-2">
               <BaseInput v-model="toEdit.name" type="text" size="sm" />
               <UButton
                 color="indigo"
@@ -206,14 +201,14 @@ async function deleteBodyPart(id: number) {
                 size="sm"
                 square
                 :loading="saving"
-                @click="editBodyPart"
+                @click="edit"
               />
             </div>
 
-            <UBadge v-else size="sm">{{ part.name }}</UBadge>
+            <UBadge v-else size="sm">{{ item.name }}</UBadge>
           </div>
 
-          <UDropdown :items="menuItems(part)">
+          <UDropdown :items="menuItems(item)">
             <UButton
               variant="ghost"
               icon="i-heroicons-ellipsis-horizontal-20-solid"
