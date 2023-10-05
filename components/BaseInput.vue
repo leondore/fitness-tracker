@@ -38,6 +38,7 @@ const emits = defineEmits<{
   (e: 'update:modelValue', value: ModelValue): void;
   (e: 'change', value: ModelValue): void;
   (e: 'blur', value: ModelValue): void;
+  (e: 'focus', value: ModelValue): void;
 }>();
 
 const value = computed({
@@ -47,6 +48,12 @@ const value = computed({
   set(value) {
     emits('update:modelValue', value);
   },
+});
+
+const inputRef = ref<Component | null>(null);
+
+defineExpose({
+  inputRef,
 });
 
 const fieldColor = computed(() => {
@@ -82,6 +89,7 @@ const displayErrors = computed(
     <div class="relative">
       <UInput
         :id="fieldId"
+        ref="inputRef"
         v-model="value"
         :type="type"
         :leading-icon="leadingIcon"

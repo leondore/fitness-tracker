@@ -98,8 +98,6 @@ export const muscleGroups = sqliteTable(
   }
 );
 
-export type MuscleGroups = typeof muscleGroups.$inferSelect;
-
 export const muscleGroupsRelations = relations(muscleGroups, ({ many }) => ({
   exercisesToMuscleGroups: many(exercisesToMuscleGroups),
 }));
@@ -184,3 +182,7 @@ export const exercisesToStagesRelations = relations(
     }),
   })
 );
+
+// Types
+export type MuscleGroups = typeof muscleGroups.$inferSelect;
+export type Stages = typeof stages.$inferSelect;

@@ -46,7 +46,12 @@ function handleError(error: unknown, defaultMessage = '') {
   showAlert(message, 'error');
 }
 
-// ---- Get Stages Data ---- //
+function toggleAddNew() {
+  showNew.value = !showNew.value;
+  alert.show = false;
+}
+
+// ---- Get Muscle Groups Data ---- //
 type PartialMuscleGroups = Pick<MuscleGroups, 'id' | 'name'>;
 const {
   data: musclegroups,
@@ -118,7 +123,9 @@ async function remove(id: number) {
 
     showAlert(`Muscle group: ${deletedItem?.name} was deleted successfully.`);
     if (musclegroups.value) {
-      musclegroups.value.filter((item) => item.id !== deletedItem?.id);
+      musclegroups.value = musclegroups.value.filter(
+        (item) => item.id !== deletedItem?.id
+      );
     } else {
       await refreshNuxtData();
     }
@@ -136,14 +143,11 @@ async function remove(id: number) {
         type="button"
         variant="solid"
         size="sm"
-        icon="i-heroicons-plus-circle"
+        :icon="showNew ? 'i-heroicons-x-circle' : 'i-heroicons-plus-circle'"
         class="w-32 justify-center"
-        @click="
-          showNew = true;
-          alert.show = false;
-        "
+        @click="toggleAddNew"
       >
-        Add New
+        {{ showNew ? 'Close' : 'Add New' }}
       </UButton>
     </header>
 

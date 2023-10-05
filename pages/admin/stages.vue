@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { AlertProps } from 'components/BaseAlert.vue';
-import { db } from '@/server/utils/db';
-import { users, type User } from '@/db/schema';
+import type { Stages } from '~/db/schema';
+import { useAlert } from '@/composables/alert';
+
+const { alert, showAlert } = useAlert('bodyparts_alert');
 
 // ---- Component State ---- //
 const showNew = ref(false);
@@ -9,13 +10,6 @@ const newItem = reactive({ name: '' });
 const toEdit = reactive({
   id: 0,
   name: '',
-});
-
-const alert = reactive<AlertProps & { show: boolean }>({
-  name: 'stages_alert',
-  show: false,
-  type: 'success',
-  message: '',
 });
 
 const saving = ref(false);
@@ -28,17 +22,6 @@ function clearFormData() {
   showNew.value = false;
 }
 
-// ---- Get Stages Data ---- //
-const { data, pending, error } = await useAsyncData(
-  'stages',
-  async () => {
-    const results = await db
-      .select({ id: users.id, email: users.email })
-      .from(users);
-  },
-  { lazy: true }
-);
-
 const menuItems = (row: { id: number; name: string }) => [
   [
     {
@@ -49,95 +32,103 @@ const menuItems = (row: { id: number; name: string }) => [
     {
       label: 'Delete',
       icon: 'i-heroicons-trash-20-solid',
-      click: () => deleteStage(row.id),
+      click: () => remove(row.id),
     },
   ],
 ];
 
-async function addStage() {
+function handleError(error: unknown, defaultMessage = '') {
+  let message = defaultMessage;
+  if (error instanceof Error) {
+    message = error.message;
+  }
+
+  showAlert(message, 'error');
+}
+
+function toggleAddNew() {
+  showNew.value = !showNew.value;
+  alert.show = false;
+}
+
+// ---- Get Stages Data ---- //
+type PartialStages = Pick<Stages, 'id' | 'name'>;
+const {
+  data: stages,
+  pending,
+  error,
+} = await useFetch<PartialStages[]>('/api/stages', {
+  lazy: true,
+});
+
+async function add() {
   saving.value = true;
 
   try {
-    const { error } = await client.from('stages').insert({
-      name: newItem.name,
-      slug: slugify(newItem.name),
+    const [createdItem] = await $fetch('/api/stages', {
+      method: 'POST',
+      body: { name: newItem.name },
     });
 
-    if (error) throw error;
-
-    alert.show = true;
-    alert.type = 'success';
-    alert.message = 'Routine stage was added successfully.';
+    showAlert(`Stage: ${createdItem?.name} was added successfully.`);
 
     clearFormData();
-    await refreshNuxtData();
-  } catch (error) {
-    let message = 'An error occurred while trying to save.';
-    if (error instanceof Error) {
-      message = error.message;
+    if (stages.value) {
+      stages.value.push(createdItem);
+      stages.value.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      await refreshNuxtData();
     }
-
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+  } catch (error) {
+    handleError(error, 'An error occurred while trying to save.');
   } finally {
     saving.value = false;
   }
 }
 
-async function editStage() {
+async function edit() {
   saving.value = true;
 
   try {
-    const { error } = await client
-      .from('stages')
-      .update({
-        name: toEdit.name,
-        slug: slugify(newItem.name),
-      })
-      .eq('id', toEdit.id);
+    const [updatedItem] = await $fetch('/api/stages', {
+      method: 'PUT',
+      body: { name: toEdit.name, id: toEdit.id },
+    });
 
-    if (error) throw error;
-
-    alert.show = true;
-    alert.type = 'success';
-    alert.message = 'Routine stage was updated successfully.';
+    showAlert(`Stage: ${updatedItem?.name} was updated successfully.`);
 
     clearFormData();
-    await refreshNuxtData();
-  } catch (error) {
-    let message = 'An error occurred while trying to save.';
-    if (error instanceof Error) {
-      message = error.message;
+    if (stages.value) {
+      stages.value?.splice(
+        stages.value?.findIndex((item) => item.id === updatedItem.id),
+        1,
+        updatedItem
+      );
+    } else {
+      await refreshNuxtData();
     }
-
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+  } catch (error) {
+    handleError(error, 'An error occurred while trying to save.');
   } finally {
     saving.value = false;
   }
 }
 
-async function deleteStage(id: number) {
+async function remove(id: number) {
   try {
-    const { error } = await client.from('stages').delete().eq('id', id);
+    const [deletedItem] = await $fetch('/api/stages', {
+      method: 'DELETE',
+      body: { id },
+    });
 
-    if (error) throw error;
-
-    alert.show = true;
-    alert.type = 'success';
-    alert.message = 'Routine stage was deleted successfully.';
-    await refreshNuxtData();
-  } catch (error) {
-    let message = 'An error occurred while trying to delete.';
-    if (error instanceof Error) {
-      message = error.message;
+    showAlert(`Stage: ${deletedItem?.name} was deleted successfully.`);
+    if (stages.value) {
+      stages.value = stages.value.filter((item) => item.id !== deletedItem?.id);
+    } else {
+      await refreshNuxtData();
     }
-
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+  } catch (error) {
+    handleError(error, 'An error occurred while trying to delete.');
   }
 }
 </script>
@@ -150,14 +141,11 @@ async function deleteStage(id: number) {
         type="button"
         variant="solid"
         size="sm"
-        icon="i-heroicons-plus-circle"
+        :icon="showNew ? 'i-heroicons-x-circle' : 'i-heroicons-plus-circle'"
         class="w-32 justify-center"
-        @click="
-          showNew = true;
-          alert.show = false;
-        "
+        @click="toggleAddNew"
       >
-        Add New
+        {{ showNew ? 'Close' : 'Add New' }}
       </UButton>
     </header>
 
@@ -170,22 +158,23 @@ async function deleteStage(id: number) {
       @close="alert.show = false"
     />
 
-    <div v-if="showNew" class="flex item-center gap-2 pb-5 pt-3">
+    <div v-if="showNew" class="relative pb-5 pt-3">
       <BaseInput
         v-model="newItem.name"
         type="text"
         size="md"
         placeholder="Enter a Name"
-        class="flex-auto"
+        class="w-full"
       />
       <UButton
         color="indigo"
         variant="solid"
         icon="i-ic-outline-save"
-        size="md"
-        class="w-32 basis-32 flex-shrink-0 flex-grow-0 justify-center"
+        size="2xs"
+        class="absolute top-[18px] right-1.5"
+        :disabled="!newItem.name"
         :loading="saving"
-        @click="addStage"
+        @click="add"
       >
         Add New
       </UButton>
@@ -200,12 +189,12 @@ async function deleteStage(id: number) {
 
       <template v-else>
         <div
-          v-for="stage in data"
-          :key="`stage${stage.id}`"
+          v-for="item in stages"
+          :key="`stage_${item.id}`"
           class="flex items-center justify-between p-2 border-b border-gray-600"
         >
           <div>
-            <div v-if="toEdit.id === stage.id" class="flex items-center gap-2">
+            <div v-if="toEdit.id === item.id" class="flex items-center gap-2">
               <BaseInput v-model="toEdit.name" type="text" size="sm" />
               <UButton
                 color="indigo"
@@ -214,14 +203,14 @@ async function deleteStage(id: number) {
                 size="sm"
                 square
                 :loading="saving"
-                @click="editStage"
+                @click="edit"
               />
             </div>
 
-            <UBadge v-else size="sm">{{ stage.name }}</UBadge>
+            <UBadge v-else size="sm">{{ item.name }}</UBadge>
           </div>
 
-          <UDropdown :items="menuItems(stage)">
+          <UDropdown :items="menuItems(item)">
             <UButton
               variant="ghost"
               icon="i-heroicons-ellipsis-horizontal-20-solid"

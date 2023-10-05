@@ -1,13 +1,7 @@
 <script setup lang="ts">
 const user = useSupabaseUser();
 
-interface Counts {
-  exercises: number;
-  stages: number;
-  musclegroups: number;
-}
-
-const { data } = await useFetch<Counts>('/api/dashboard', {
+const { data } = await useFetch('/api/dashboard', {
   lazy: true,
 });
 </script>
