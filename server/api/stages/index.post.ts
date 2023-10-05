@@ -1,12 +1,12 @@
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
-import { stages, type Stages } from '~/db/schema';
+import { stages, type Stage } from '~/db/schema';
 
 export default defineEventHandler(async (event) => {
-  const { name } = await readBody<Stages>(event);
+  const { name } = await readBody<Stage>(event);
 
   try {
-    const created: Stages[] = await db
+    const created: Stage[] = await db
       .insert(stages)
       .values({
         name,

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Stages } from '~/db/schema';
+import type { Stage } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 
-const { alert, showAlert } = useAlert('bodyparts_alert');
+const { alert, showAlert } = useAlert('stages_alert');
 
 // ---- Component State ---- //
 const showNew = ref(false);
@@ -52,12 +52,12 @@ function toggleAddNew() {
 }
 
 // ---- Get Stages Data ---- //
-type PartialStages = Pick<Stages, 'id' | 'name'>;
+type PartialStage = Pick<Stage, 'id' | 'name'>;
 const {
   data: stages,
   pending,
   error,
-} = await useFetch<PartialStages[]>('/api/stages', {
+} = await useFetch<PartialStage[]>('/api/stages', {
   lazy: true,
 });
 

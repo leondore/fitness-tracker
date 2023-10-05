@@ -1,12 +1,12 @@
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
-import { muscleGroups, type MuscleGroups } from '~/db/schema';
+import { muscleGroups, type MuscleGroup } from '~/db/schema';
 
 export default defineEventHandler(async (event) => {
-  const { name } = await readBody<MuscleGroups>(event);
+  const { name } = await readBody<MuscleGroup>(event);
 
   try {
-    const created: MuscleGroups[] = await db
+    const created: MuscleGroup[] = await db
       .insert(muscleGroups)
       .values({
         name,

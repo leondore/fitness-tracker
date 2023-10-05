@@ -1,13 +1,13 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
-import { stages, type Stages } from '~/db/schema';
+import { stages, type Stage } from '~/db/schema';
 
 export default defineEventHandler(async (event) => {
-  const { id, name } = await readBody<Stages>(event);
+  const { id, name } = await readBody<Stage>(event);
 
   try {
-    const updated: Stages[] = await db
+    const updated: Stage[] = await db
       .update(stages)
       .set({ name, updatedAt: Math.floor(Date.now() / 1000) })
       .where(eq(stages.id, id))

@@ -1,53 +1,14 @@
 <script setup lang="ts">
-import type { AlertProps } from 'components/BaseAlert.vue';
+import type { ExerciseJoined } from '~/db/schema';
+import { useAlert } from '@/composables/alert';
 
-const client = useSupabaseClient();
-const { data, pending } = await useAsyncData(
-  'exercises',
-  async () => {
-    const { data, error } = await client
-      .from('exercises')
-      .select(
-        `
-      id,
-      name,
-      slug,
-      stages (
-        name
-      ),
-      bodyparts (
-        name
-      )
-    `
-      )
-      .order('name', { ascending: true })
-      .order('name', { foreignTable: 'bodyparts', ascending: true })
-      .order('name', { foreignTable: 'stages', ascending: true });
+const { alert, showAlert } = useAlert('exercises_alert');
 
-    if (error) {
-      alert.message = error.message;
-      alert.show = true;
-    }
-    return data;
-  },
-  { lazy: true }
-);
-
-interface Exercise {
-  id: number;
-  name: string;
-  slug: string;
-  stages: { name: string }[];
-  bodyparts: { name: string }[];
-}
-const rows = computed(() => data.value || undefined);
-
-const alert = reactive<AlertProps & { show: boolean }>({
-  name: 'exercises_alert',
-  show: false,
-  type: 'error',
-  message: '',
+const { data: exercises, pending } = await useFetch('/api/exercises', {
+  lazy: true,
 });
+
+const rows = computed(() => exercises.value || undefined);
 
 const columns = [
   {
@@ -59,7 +20,7 @@ const columns = [
     label: 'Routine Stages',
   },
   {
-    key: 'bodyparts',
+    key: 'musclegroups',
     label: 'Muscle Groups',
   },
   {
@@ -68,7 +29,7 @@ const columns = [
   },
 ];
 
-const menuItems = (row: Exercise) => [
+const menuItems = (row: ExerciseJoined) => [
   [
     {
       label: 'Edit',
@@ -133,24 +94,24 @@ async function deleteExercise(id: number) {
 
     <div class="w-full overflow-x-auto">
       <UTable :loading="pending" :columns="columns" :rows="rows">
-        <template #stages-data="{ row }">
+        <template #stages-data="{ row }: { row: ExerciseJoined }">
           <div class="flex items-center gap-1.5">
             <UBadge
-              v-for="(stage, index) in row.stages"
+              v-for="(stage, index) in row.exercisesToStages"
               :key="`ex${row.id}_stage${index}`"
               size="sm"
-              >{{ stage.name }}</UBadge
+              >{{ stage.stages.name }}</UBadge
             >
           </div>
         </template>
 
-        <template #bodyparts-data="{ row }">
+        <template #musclegroups-data="{ row }">
           <div class="flex items-center gap-1.5">
             <UBadge
-              v-for="(bodypart, index) in row.bodyparts"
-              :key="`ex${row.id}_bodypart${index}`"
+              v-for="(musclegroup, index) in row.exercisesToMuscleGroups"
+              :key="`ex${row.id}_musclegroup${index}`"
               size="sm"
-              >{{ bodypart.name }}</UBadge
+              >{{ musclegroup.muscleGroups.name }}</UBadge
             >
           </div>
         </template>

@@ -1,13 +1,13 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
-import { muscleGroups, type MuscleGroups } from '~/db/schema';
+import { muscleGroups, type MuscleGroup } from '~/db/schema';
 
 export default defineEventHandler(async (event) => {
-  const { id } = await readBody<MuscleGroups>(event);
+  const { id } = await readBody<MuscleGroup>(event);
 
   try {
-    const deleted: MuscleGroups[] = await db
+    const deleted: MuscleGroup[] = await db
       .delete(muscleGroups)
       .where(eq(muscleGroups.id, id))
       .returning();

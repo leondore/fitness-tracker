@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MuscleGroups } from '~/db/schema';
+import type { MuscleGroup } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 
 const { alert, showAlert } = useAlert('bodyparts_alert');
@@ -52,12 +52,12 @@ function toggleAddNew() {
 }
 
 // ---- Get Muscle Groups Data ---- //
-type PartialMuscleGroups = Pick<MuscleGroups, 'id' | 'name'>;
+type PartialMuscleGroup = Pick<MuscleGroup, 'id' | 'name'>;
 const {
   data: musclegroups,
   pending,
   error,
-} = await useFetch<PartialMuscleGroups[]>('/api/muscle-groups', {
+} = await useFetch<PartialMuscleGroup[]>('/api/muscle-groups', {
   lazy: true,
 });
 
