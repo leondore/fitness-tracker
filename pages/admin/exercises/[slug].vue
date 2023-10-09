@@ -1,38 +1,31 @@
 <script setup lang="ts">
-import type { AlertProps } from 'components/BaseAlert.vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
+import type { Exercise, ExerciseInsert } from '~/db/schema';
+import { useAlert } from '@/composables/alert';
+
+const { alert, showAlert } = useAlert('exercises_insert_alert');
+
+interface ExerciseBody extends ExerciseInsert {
+  stages: { id: number; name: string }[];
+  musclegroups: { id: number; name: string }[];
+}
 
 // ---- Component State ---- //
 const { params } = useRoute();
 
-interface Exercise {
-  name: string;
-  description: string;
-  stages: { id: number; name: string }[];
-  bodyparts: { id: number; name: string }[];
-  video_url: string;
-  image_url: string;
-}
-const formData = reactive<Exercise>({
+const formData = reactive<ExerciseBody>({
   name: '',
+  slug: '',
   description: '',
-  stages: [],
-  bodyparts: [],
   image_url: '',
   video_url: '',
-});
-
-const alert = reactive<AlertProps & { show: boolean }>({
-  name: 'exercises_new_alert',
-  show: false,
-  type: 'success',
-  message: '',
+  stages: [],
+  musclegroups: [],
 });
 
 const saving = ref(false);
 const loading = ref(false);
-const client = useSupabaseClient();
 
 const content = computed(() =>
   params.slug === 'new'
@@ -56,11 +49,12 @@ const v$ = useVuelidate(rules, formData);
 // ---- Reset State ---- //
 function clearFormData() {
   formData.name = '';
+  formData.slug = '';
   formData.description = '';
-  formData.stages = [];
-  formData.bodyparts = [];
   formData.image_url = '';
   formData.video_url = '';
+  formData.stages = [];
+  formData.musclegroups = [];
 }
 
 // ---- Get Stages Select Options ---- //
@@ -68,18 +62,9 @@ const {
   data: stages,
   pending: stagesPending,
   error: stagesError,
-} = await useAsyncData(
-  'stages',
-  async () => {
-    const { data, error } = await client
-      .from('stages')
-      .select('id, name')
-      .order('name');
-    if (error) throw error;
-    return data;
-  },
-  { lazy: true }
-);
+} = await useFetch('/api/stages', {
+  lazy: true,
+});
 const stagesOptions = computed(() => stages.value || undefined);
 
 // ---- Get Muscles Group Select Options ---- //
@@ -87,18 +72,9 @@ const {
   data: muscles,
   pending: musclesPending,
   error: musclesError,
-} = await useAsyncData(
-  'bodyparts',
-  async () => {
-    const { data, error } = await client
-      .from('bodyparts')
-      .select('id, name')
-      .order('name');
-    if (error) throw error;
-    return data;
-  },
-  { lazy: true }
-);
+} = await useFetch('/api/muscle-groups', {
+  lazy: true,
+});
 const musclesOptions = computed(() => muscles.value || undefined);
 
 // ---- Get Exercise Data ---- //
@@ -266,7 +242,7 @@ async function addExercise() {
 
       <BaseSelect
         v-if="!musclesError"
-        v-model="formData.bodyparts"
+        v-model="formData.musclegroups"
         label="Muscle Groups"
         size="lg"
         multiple

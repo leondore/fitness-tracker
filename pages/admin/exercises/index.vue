@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ExerciseJoined } from '~/db/schema';
+import type { ExerciseFull } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 
 const { alert, showAlert } = useAlert('exercises_alert');
@@ -29,7 +29,7 @@ const columns = [
   },
 ];
 
-const menuItems = (row: ExerciseJoined) => [
+const menuItems = (row: ExerciseFull) => [
   [
     {
       label: 'Edit',
@@ -39,30 +39,28 @@ const menuItems = (row: ExerciseJoined) => [
     {
       label: 'Delete',
       icon: 'i-heroicons-trash-20-solid',
-      click: () => deleteExercise(row.id),
+      click: () => remove(row.id),
     },
   ],
 ];
 
-async function deleteExercise(id: number) {
+async function remove(id: number) {
   try {
-    const { error } = await client.from('exercises').delete().eq('id', id);
+    const [deletedItem] = await $fetch('/api/exercises', {
+      method: 'DELETE',
+      body: { id },
+    });
 
-    if (error) throw error;
-
-    alert.show = true;
-    alert.type = 'success';
-    alert.message = 'Exercise was deleted successfully.';
-    await refreshNuxtData();
-  } catch (error) {
-    let message = 'An error occurred while trying to delete.';
-    if (error instanceof Error) {
-      message = error.message;
+    showAlert(`Exercise: ${deletedItem?.name} was deleted successfully.`);
+    if (exercises.value) {
+      exercises.value = exercises.value.filter(
+        (item) => item.id !== deletedItem?.id
+      );
+    } else {
+      await refreshNuxtData();
     }
-
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+  } catch (error) {
+    handleError(error, 'An error occurred while trying to delete.');
   }
 }
 </script>
@@ -94,7 +92,7 @@ async function deleteExercise(id: number) {
 
     <div class="w-full overflow-x-auto">
       <UTable :loading="pending" :columns="columns" :rows="rows">
-        <template #stages-data="{ row }: { row: ExerciseJoined }">
+        <template #stages-data="{ row }: { row: ExerciseFull }">
           <div class="flex items-center gap-1.5">
             <UBadge
               v-for="(stage, index) in row.exercisesToStages"
@@ -105,7 +103,7 @@ async function deleteExercise(id: number) {
           </div>
         </template>
 
-        <template #musclegroups-data="{ row }">
+        <template #musclegroups-data="{ row }: { row: ExerciseFull }">
           <div class="flex items-center gap-1.5">
             <UBadge
               v-for="(musclegroup, index) in row.exercisesToMuscleGroups"
@@ -116,7 +114,7 @@ async function deleteExercise(id: number) {
           </div>
         </template>
 
-        <template #actions-data="{ row }">
+        <template #actions-data="{ row }: { row: ExerciseFull }">
           <UDropdown :items="menuItems(row)">
             <UButton
               variant="ghost"

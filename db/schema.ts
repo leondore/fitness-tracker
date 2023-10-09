@@ -185,7 +185,7 @@ export const exercisesToStagesRelations = relations(
 
 // Types
 export type Exercise = typeof exercises.$inferSelect;
-export type ExerciseJoined = Exercise & {
+export type ExerciseFull = Exercise & {
   exercisesToMuscleGroups: {
     muscleGroups: {
       name: string;
@@ -197,5 +197,6 @@ export type ExerciseJoined = Exercise & {
     };
   }[];
 };
+export type ExerciseInsert = typeof exercises.$inferInsert;
 export type MuscleGroup = typeof muscleGroups.$inferSelect;
 export type Stage = typeof stages.$inferSelect;
