@@ -44,6 +44,15 @@ const menuItems = (row: ExerciseFull) => [
   ],
 ];
 
+function handleError(error: unknown, defaultMessage = '') {
+  let message = defaultMessage;
+  if (error instanceof Error) {
+    message = error.message;
+  }
+
+  showAlert(message, 'error');
+}
+
 async function remove(id: number) {
   try {
     const [deletedItem] = await $fetch('/api/exercises', {

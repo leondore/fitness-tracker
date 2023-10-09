@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
-import type { Exercise, ExerciseInsert } from '~/db/schema';
+import type { ExerciseInsertFull } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 
 const { alert, showAlert } = useAlert('exercises_insert_alert');
 
-interface ExerciseBody extends ExerciseInsert {
-  stages: { id: number; name: string }[];
-  musclegroups: { id: number; name: string }[];
+interface ExerciseBody extends ExerciseInsertFull {
+  stages?: { id: number; name: string }[];
+  musclegroups?: { id: number; name: string }[];
 }
 
 // ---- Component State ---- //
@@ -32,6 +32,15 @@ const content = computed(() =>
     ? { title: 'Add New Exercise', btn: 'Add Exercise' }
     : { title: 'Edit Exercise', btn: 'Save Changes' }
 );
+
+function handleError(error: unknown, defaultMessage = '') {
+  let message = defaultMessage;
+  if (error instanceof Error) {
+    message = error.message;
+  }
+
+  showAlert(message, 'error');
+}
 
 // ---- Form validation ---- //
 const rules = computed(() => {
@@ -82,36 +91,34 @@ async function getExercise(slug: string | string[]) {
   loading.value = true;
 
   try {
-    const { data, error } = await client
-      .from('exercises')
-      .select(
-        `
-        name,
-        description,
-        stages (
-          name
-        ),
-        bodyparts (
-          name
-        ),
-        image_url,
-        video_url
-      `
-      )
-      .eq('slug', slug);
+    const data = await $fetch(`/api/exercises/${slug}`);
 
-    if (error) throw error;
-
-    return data;
-  } catch (error) {
-    let message = 'An error occurred while trying to load the data.';
-    if (error instanceof Error) {
-      message = error.message;
+    if (!data.length) {
+      throw new Error('Exercise not found.');
     }
 
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+    const exercise: ExerciseBody = data[0];
+    if (
+      exercise.exercisesToMuscleGroups &&
+      exercise.exercisesToMuscleGroups.length
+    ) {
+      exercise.musclegroups = [];
+      exercise.exercisesToMuscleGroups.forEach((muscleGroup) => {
+        exercise.musclegroups?.push(muscleGroup.muscleGroups);
+      });
+      delete exercise.exercisesToMuscleGroups;
+    }
+    if (exercise.exercisesToStages && exercise.exercisesToStages.length) {
+      exercise.stages = [];
+      exercise.exercisesToStages.forEach((stage) => {
+        exercise.stages?.push(stage.stages);
+      });
+      delete exercise.exercisesToStages;
+    }
+
+    return exercise;
+  } catch (error) {
+    handleError(error, 'An error occurred while trying to load the data.');
   } finally {
     loading.value = false;
   }
@@ -122,7 +129,7 @@ onMounted(() => {
     if (params.slug !== 'new') {
       const data = await getExercise(params.slug);
       if (data) {
-        Object.assign(formData, data[0]);
+        Object.assign(formData, data);
       }
     }
   });
