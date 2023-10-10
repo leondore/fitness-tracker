@@ -4,7 +4,7 @@ import type { ColorOpts, SizeOpts } from '@/types';
 
 const fieldId = `input_${uid()}`;
 
-type ModelValue = string | number | undefined;
+type ModelValue = string | number | null | undefined;
 type InputVariant = 'outline' | 'none';
 
 interface Props {
@@ -43,7 +43,7 @@ const emits = defineEmits<{
 
 const value = computed({
   get() {
-    return props.modelValue;
+    return props.modelValue === null ? '' : props.modelValue;
   },
   set(value) {
     emits('update:modelValue', value);

@@ -214,3 +214,5 @@ export type ExerciseInsertFull = ExerciseInsert & {
 };
 export type MuscleGroup = typeof muscleGroups.$inferSelect;
 export type Stage = typeof stages.$inferSelect;
+export type ExerciseToMuscleGroup = typeof exercisesToMuscleGroups.$inferInsert;
+export type ExerciseToStage = typeof exercisesToStages.$inferInsert;

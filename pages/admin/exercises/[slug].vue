@@ -1,22 +1,16 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
-import type { ExerciseInsertFull } from '~/db/schema';
+import type { ExerciseBody } from '@/types/resources';
 import { useAlert } from '@/composables/alert';
 
 const { alert, showAlert } = useAlert('exercises_insert_alert');
-
-interface ExerciseBody extends ExerciseInsertFull {
-  stages?: { id: number; name: string }[];
-  musclegroups?: { id: number; name: string }[];
-}
 
 // ---- Component State ---- //
 const { params } = useRoute();
 
 const formData = reactive<ExerciseBody>({
   name: '',
-  slug: '',
   description: '',
   image_url: '',
   video_url: '',
@@ -58,7 +52,6 @@ const v$ = useVuelidate(rules, formData);
 // ---- Reset State ---- //
 function clearFormData() {
   formData.name = '';
-  formData.slug = '';
   formData.description = '';
   formData.image_url = '';
   formData.video_url = '';
@@ -136,61 +129,24 @@ onMounted(() => {
 });
 
 // ---- Submission Function ---- //
-async function addExercise() {
+async function add() {
   v$.value.$validate();
   if (v$.value.$error) return;
 
   saving.value = true;
+
   try {
-    const { data, error } = await client
-      .from('exercises')
-      .insert({
-        name: formData.name,
-        slug: slugify(formData.name),
-        description: formData.description,
-        image_url: formData.image_url,
-        video_url: formData.video_url,
-      })
-      .select();
+    const createdItem = await $fetch('/api/exercises', {
+      method: 'POST',
+      body: formData,
+    });
 
-    if (error) throw error;
+    showAlert(`Exercise: ${createdItem.name} was successfully created.`);
 
-    const exerciseId = data[0].id;
-
-    const exercisesStages = formData.stages.map((stage) => ({
-      exercise_id: exerciseId,
-      stage_id: stage.id,
-    }));
-    const { error: esError } = await client
-      .from('exercises_stages')
-      .insert(exercisesStages);
-    if (esError) throw esError;
-
-    const exercisesBodyparts = formData.bodyparts.map((bodypart) => ({
-      exercise_id: exerciseId,
-      bodypart_id: bodypart.id,
-    }));
-    const { error: ebpError } = await client
-      .from('exercises_bodyparts')
-      .insert(exercisesBodyparts);
-    if (ebpError) throw ebpError;
-
-    if (data.length) {
-      alert.show = true;
-      alert.type = 'success';
-      alert.message = `Exercise: ${formData.name} was successfully created.`;
-    }
     clearFormData();
     v$.value.$reset();
   } catch (error) {
-    let message = 'An error occurred while trying to save.';
-    if (error instanceof Error) {
-      message = error.message;
-    }
-
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+    handleError(error, 'An error occurred while trying to save.');
   } finally {
     saving.value = false;
   }
@@ -226,7 +182,7 @@ async function addExercise() {
 
     <form
       class="grid grid-cols-2 gap-4 p-8 rounded-md border border-solid border-zinc-700 bg-zinc-950"
-      @submit.prevent="addExercise"
+      @submit.prevent="add"
     >
       <BaseInput
         v-model="formData.name"

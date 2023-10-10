@@ -10,6 +10,7 @@ type InputVariant = 'outline' | 'none';
 interface Props {
   modelValue?: ModelValue;
   options?: string[] | { [key: string]: any; disabled?: boolean }[];
+  by?: string;
   optionAttr?: string;
   label?: string;
   multiple?: boolean;
@@ -27,6 +28,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   options: () => [],
+  by: 'id',
   optionAttr: 'label',
   label: '',
   multiple: false,
@@ -112,6 +114,7 @@ const displayErrors = computed(
         :id="fieldId"
         v-model="value"
         :options="options"
+        :by="by"
         :option-attribute="optionAttr"
         :multiple="multiple"
         :leading-icon="leadingIcon"
