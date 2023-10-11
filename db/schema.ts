@@ -126,10 +126,10 @@ export const exercisesToMuscleGroups = sqliteTable(
   {
     exerciseId: integer('exercise_id')
       .notNull()
-      .references(() => exercises.id),
+      .references(() => exercises.id, { onDelete: 'cascade' }),
     muscleGroupId: integer('musclegroup_id')
       .notNull()
-      .references(() => muscleGroups.id),
+      .references(() => muscleGroups.id, { onDelete: 'cascade' }),
   },
   (table) => {
     return {
@@ -157,10 +157,10 @@ export const exercisesToStages = sqliteTable(
   {
     exerciseId: integer('exercise_id')
       .notNull()
-      .references(() => exercises.id),
+      .references(() => exercises.id, { onDelete: 'cascade' }),
     stagesId: integer('stages_id')
       .notNull()
-      .references(() => stages.id),
+      .references(() => stages.id, { onDelete: 'cascade' }),
   },
   (table) => {
     return {

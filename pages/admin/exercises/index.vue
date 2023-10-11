@@ -92,9 +92,9 @@ async function remove(id: number) {
 
     <BaseAlert
       v-if="alert.show"
-      type="error"
-      name="Error"
       class="mb-4"
+      :type="alert.type"
+      :name="alert.name"
       :message="alert.message"
       @close="alert.show = false"
     />

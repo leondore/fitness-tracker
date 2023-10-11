@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { uid } from 'uid';
+import { eq } from 'drizzle-orm';
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
 import {
@@ -12,21 +12,25 @@ import {
 import type { ExerciseBody } from '@/types/resources';
 
 export default defineEventHandler(async (event) => {
+  const slug = getRouterParam(event, 'slug');
+  if (!slug) {
+    return handleError(new Error('No slug provided'));
+  }
+
   const { name, description, image_url, video_url, stages, musclegroups } =
     await readBody<ExerciseBody>(event);
 
   try {
-    const slug = uid(16);
-
-    const [created] = await db
-      .insert(exercises)
-      .values({
+    const [updated] = await db
+      .update(exercises)
+      .set({
         name,
-        slug,
         description,
+        updatedAt: Math.floor(Date.now() / 1000),
         image_url,
         video_url,
       })
+      .where(eq(exercises.slug, slug))
       .returning();
 
     if (stages && stages.length) {

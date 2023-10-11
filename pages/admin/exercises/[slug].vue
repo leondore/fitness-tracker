@@ -129,7 +129,7 @@ onMounted(() => {
 });
 
 // ---- Submission Function ---- //
-async function add() {
+async function save() {
   v$.value.$validate();
   if (v$.value.$error) return;
 
@@ -182,7 +182,7 @@ async function add() {
 
     <form
       class="grid grid-cols-2 gap-4 p-8 rounded-md border border-solid border-zinc-700 bg-zinc-950"
-      @submit.prevent="add"
+      @submit.prevent="save"
     >
       <BaseInput
         v-model="formData.name"

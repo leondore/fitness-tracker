@@ -13,16 +13,16 @@ CREATE TABLE `exercises_musclegroups` (
 	`exercise_id` integer NOT NULL,
 	`musclegroup_id` integer NOT NULL,
 	PRIMARY KEY(`exercise_id`, `musclegroup_id`),
-	FOREIGN KEY (`exercise_id`) REFERENCES `exercises`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`musclegroup_id`) REFERENCES `musclegroups`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`exercise_id`) REFERENCES `exercises`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`musclegroup_id`) REFERENCES `musclegroups`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `exercises_stages` (
 	`exercise_id` integer NOT NULL,
 	`stages_id` integer NOT NULL,
 	PRIMARY KEY(`exercise_id`, `stages_id`),
-	FOREIGN KEY (`exercise_id`) REFERENCES `exercises`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`stages_id`) REFERENCES `stages`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`exercise_id`) REFERENCES `exercises`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`stages_id`) REFERENCES `stages`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `musclegroups` (

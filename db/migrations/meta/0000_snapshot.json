@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "f89c3697-3989-4a4b-916c-4c3fafb4441f",
+  "id": "1adf8605-9add-4145-a922-e6c01bc9f545",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "exercises": {
@@ -123,7 +123,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "exercises_musclegroups_musclegroup_id_musclegroups_id_fk": {
@@ -136,7 +136,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -180,7 +180,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "exercises_stages_stages_id_stages_id_fk": {
@@ -193,7 +193,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
