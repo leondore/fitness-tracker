@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
-import type { ExerciseBody } from '@/types/resources';
+import { submitExerciseSchema, type ExerciseSubmitBody } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 
 const { alert, showAlert } = useAlert('exercises_insert_alert');
@@ -9,7 +9,7 @@ const { alert, showAlert } = useAlert('exercises_insert_alert');
 // ---- Component State ---- //
 const { params } = useRoute();
 
-const formData = reactive<ExerciseBody>({
+const formData = reactive<ExerciseSubmitBody>({
   name: '',
   description: '',
   image_url: '',
@@ -90,7 +90,7 @@ async function getExercise(slug: string | string[]) {
       throw new Error('Exercise not found.');
     }
 
-    const exercise: ExerciseBody = data[0];
+    const exercise: ExerciseSubmitBody = data[0];
     if (
       exercise.exercisesToMuscleGroups &&
       exercise.exercisesToMuscleGroups.length
@@ -180,9 +180,11 @@ async function save() {
       @close="alert.show = false"
     />
 
-    <form
+    <UForm
       class="grid grid-cols-2 gap-4 p-8 rounded-md border border-solid border-zinc-700 bg-zinc-950"
-      @submit.prevent="save"
+      :schema="submitExerciseSchema"
+      :state="formData"
+      @submit="save"
     >
       <BaseInput
         v-model="formData.name"
@@ -258,6 +260,6 @@ async function save() {
       >
         {{ content.btn }}
       </UButton>
-    </form>
+    </UForm>
   </div>
 </template>

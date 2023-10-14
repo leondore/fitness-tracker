@@ -81,7 +81,7 @@ const displayErrors = computed(
         :placeholder="placeholder"
         :disabled="disabled"
         resize
-        class="w-full px-3.5 py-2.5"
+        class="w-full py-2.5"
         @change="emits('change', value)"
         @blur="emits('blur', value)"
       />

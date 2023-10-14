@@ -7,6 +7,8 @@ import {
   uniqueIndex,
   index,
 } from 'drizzle-orm/sqlite-core';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
 export const roles = sqliteTable(
   'roles',
@@ -183,35 +185,68 @@ export const exercisesToStagesRelations = relations(
   })
 );
 
+// Zod
+export const selectExerciseSchema = createSelectSchema(exercises);
+
+export const insertExerciseSchema = createInsertSchema(exercises);
+
+export const submitExerciseSchema = insertExerciseSchema.extend({
+  slug: z.string().optional(),
+  stages: z
+    .array(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+      })
+    )
+    .optional(),
+  musclegroups: z
+    .array(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+      })
+    )
+    .optional(),
+});
+
+export const joinedToExercises = z.object({
+  exercisesToMuscleGroups: z
+    .array(
+      z.object({
+        muscleGroups: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      })
+    )
+    .optional(),
+  exercisesToStages: z
+    .array(
+      z.object({
+        stages: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      })
+    )
+    .optional(),
+});
+
+export const selectExerciseJoinedSchema =
+  selectExerciseSchema.merge(joinedToExercises);
+
+export const submitExerciseJoinedSchema =
+  submitExerciseSchema.merge(joinedToExercises);
+
 // Types
-export type Exercise = typeof exercises.$inferSelect;
-export type ExerciseInsert = typeof exercises.$inferInsert;
-export type ExerciseFull = Exercise & {
-  exercisesToMuscleGroups: {
-    muscleGroups: {
-      name: string;
-    };
-  }[];
-  exercisesToStages: {
-    stages: {
-      name: string;
-    };
-  }[];
-};
-export type ExerciseInsertFull = ExerciseInsert & {
-  exercisesToMuscleGroups?: {
-    muscleGroups: {
-      id: number;
-      name: string;
-    };
-  }[];
-  exercisesToStages?: {
-    stages: {
-      id: number;
-      name: string;
-    };
-  }[];
-};
+export type Exercise = z.infer<typeof selectExerciseSchema>;
+export type ExerciseFull = z.infer<typeof selectExerciseJoinedSchema>;
+
+export type ExerciseInsert = z.infer<typeof insertExerciseSchema>;
+export type ExerciseSubmit = z.infer<typeof submitExerciseSchema>;
+export type ExerciseSubmitBody = z.infer<typeof submitExerciseJoinedSchema>;
+
 export type MuscleGroup = typeof muscleGroups.$inferSelect;
 export type Stage = typeof stages.$inferSelect;
 export type ExerciseToMuscleGroup = typeof exercisesToMuscleGroups.$inferInsert;
