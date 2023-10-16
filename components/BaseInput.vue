@@ -10,6 +10,8 @@ type InputVariant = 'outline' | 'none';
 interface Props {
   modelValue?: ModelValue;
   type?: HTMLInputElement['type'];
+  name?: string;
+  required?: boolean;
   label?: string;
   leadingIcon?: `i-${string}`;
   trailingIcon?: `i-${string}`;
@@ -19,11 +21,12 @@ interface Props {
   placeholder?: string;
   disabled?: boolean;
   loading?: boolean;
-  validationStatus?: Record<string, any>;
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   type: 'text',
+  name: '',
+  required: false,
   label: '',
   leadingIcon: undefined,
   trailingIcon: undefined,
@@ -31,7 +34,6 @@ const props = withDefaults(defineProps<Props>(), {
   variant: 'outline',
   size: 'md',
   placeholder: '',
-  validationStatus: () => ({}),
 });
 
 const emits = defineEmits<{
@@ -50,64 +52,43 @@ const value = computed({
   },
 });
 
-const inputRef = ref<Component | null>(null);
-
-defineExpose({
-  inputRef,
+const nameProp = computed(() => {
+  return props.name || fieldId;
 });
 
-const fieldColor = computed(() => {
-  if (props.validationStatus.$dirty) {
-    return props.validationStatus.$invalid ? 'red' : 'green';
-  }
-
-  return props.color;
+const formErrors =
+  inject<Ref<{ path: string; message: string }[]>>('form-errors');
+const errors = computed(() => {
+  return (
+    formErrors?.value.filter((error) => error.path === nameProp.value) || []
+  );
 });
 
 const suffixIcon = computed(() => {
-  if (props.validationStatus.$dirty) {
-    return props.validationStatus.$invalid
-      ? 'i-ic-outline-error-outline'
-      : 'i-ic-outline-check-circle-outline';
+  if (errors.value.length) {
+    return 'i-ic-outline-error-outline';
   }
 
   return props.trailingIcon;
 });
-
-const displayErrors = computed(
-  () =>
-    props.validationStatus.$dirty && props.validationStatus.$errors.length > 0
-);
 </script>
 
 <template>
-  <div data-component="input">
-    <label v-if="label" :for="fieldId" class="text-xs inline-flex mb-1.5">{{
-      label
-    }}</label>
-
-    <div class="relative">
-      <UInput
-        :id="fieldId"
-        ref="inputRef"
-        v-model="value"
-        :type="type"
-        :leading-icon="leadingIcon"
-        :trailing-icon="suffixIcon"
-        :color="fieldColor"
-        :variant="variant"
-        :size="size"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :loading="loading"
-        loading-icon="i-ic-outline-sync"
-        @change="emits('change', value)"
-        @blur="emits('blur', value)"
-      />
-
-      <small v-if="displayErrors" class="block mt-1 text-xs text-red-500">
-        {{ props.validationStatus.$errors[0].$message }}
-      </small>
-    </div>
-  </div>
+  <UFormGroup :label="label" :name="nameProp" :required="required" size="xs">
+    <UInput
+      v-model="value"
+      :type="type"
+      :leading-icon="leadingIcon"
+      :trailing-icon="suffixIcon"
+      :color="color"
+      :variant="variant"
+      :size="size"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :loading="loading"
+      loading-icon="i-ic-outline-sync"
+      @change="emits('change', value)"
+      @blur="emits('blur', value)"
+    />
+  </UFormGroup>
 </template>

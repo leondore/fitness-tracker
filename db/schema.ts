@@ -188,7 +188,14 @@ export const exercisesToStagesRelations = relations(
 // Zod
 export const selectExerciseSchema = createSelectSchema(exercises);
 
-export const insertExerciseSchema = createInsertSchema(exercises);
+export const insertExerciseSchema = createInsertSchema(exercises, {
+  name: (schema) =>
+    schema.name
+      .min(3, { message: 'Name must be at least 3 characters long' })
+      .max(255),
+  video_url: (schema) => schema.video_url.url(),
+  image_url: (schema) => schema.image_url.url(),
+});
 
 export const submitExerciseSchema = insertExerciseSchema.extend({
   slug: z.string().optional(),

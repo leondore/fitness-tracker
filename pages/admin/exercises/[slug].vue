@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core';
-import { required, helpers } from '@vuelidate/validators';
 import { submitExerciseSchema, type ExerciseSubmitBody } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 
@@ -11,9 +9,9 @@ const { params } = useRoute();
 
 const formData = reactive<ExerciseSubmitBody>({
   name: '',
-  description: '',
-  image_url: '',
-  video_url: '',
+  description: undefined,
+  image_url: undefined,
+  video_url: undefined,
   stages: [],
   musclegroups: [],
 });
@@ -35,19 +33,6 @@ function handleError(error: unknown, defaultMessage = '') {
 
   showAlert(message, 'error');
 }
-
-// ---- Form validation ---- //
-const rules = computed(() => {
-  return {
-    name: {
-      required: helpers.withMessage(
-        'You must enter a name for the exercise',
-        required
-      ),
-    },
-  };
-});
-const v$ = useVuelidate(rules, formData);
 
 // ---- Reset State ---- //
 function clearFormData() {
@@ -130,9 +115,6 @@ onMounted(() => {
 
 // ---- Submission Function ---- //
 async function save() {
-  v$.value.$validate();
-  if (v$.value.$error) return;
-
   saving.value = true;
 
   try {
@@ -144,7 +126,6 @@ async function save() {
     showAlert(`Exercise: ${createdItem.name} was successfully created.`);
 
     clearFormData();
-    v$.value.$reset();
   } catch (error) {
     handleError(error, 'An error occurred while trying to save.');
   } finally {
@@ -189,13 +170,11 @@ async function save() {
       <BaseInput
         v-model="formData.name"
         type="text"
+        name="name"
         label="Name"
         size="lg"
         placeholder="Ex. Push-Ups"
         class="col-span-2"
-        :validation-status="v$.name"
-        @change="v$.name.$touch"
-        @blur="v$.name.$touch"
       />
 
       <BaseTextarea
