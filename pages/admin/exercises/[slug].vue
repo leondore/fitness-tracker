@@ -117,13 +117,24 @@ onMounted(() => {
 async function save() {
   saving.value = true;
 
+  type SubmitParams = {
+    url: '/api/exercises' | `/api/exercises/${string}`;
+    method: 'POST' | 'PUT';
+  };
+  const apiUrl: SubmitParams['url'] =
+    params.slug === 'new' ? '/api/exercises' : `/api/exercises/${params.slug}`;
+  const method: SubmitParams['method'] = params.slug === 'new' ? 'POST' : 'PUT';
+
   try {
-    const createdItem = await $fetch('/api/exercises', {
-      method: 'POST',
+    const savedItem = await $fetch(apiUrl, {
+      method,
       body: formData,
     });
 
-    showAlert(`Exercise: ${createdItem.name} was successfully created.`);
+    if (params.slug === 'new') {
+      navigateTo(`/admin/exercises/${savedItem.slug}`);
+    }
+    showAlert(`Exercise: ${savedItem.name} was successfully created.`);
 
     clearFormData();
   } catch (error) {
@@ -175,11 +186,14 @@ async function save() {
         size="lg"
         placeholder="Ex. Push-Ups"
         class="col-span-2"
+        required
       />
 
       <BaseTextarea
         v-model="formData.description"
+        name="description"
         label="Description"
+        size="lg"
         placeholder="Push-ups are a classic and effective bodyweight exercise that targets the upper body, especially the chest, shoulders, and triceps."
         class="col-span-2"
       />
@@ -187,6 +201,7 @@ async function save() {
       <BaseSelect
         v-if="!musclesError"
         v-model="formData.musclegroups"
+        name="musclegroups"
         label="Muscle Groups"
         size="lg"
         multiple
@@ -200,6 +215,7 @@ async function save() {
       <BaseSelect
         v-if="!stagesError"
         v-model="formData.stages"
+        name="stages"
         label="Routine Stages"
         size="lg"
         multiple
@@ -213,6 +229,7 @@ async function save() {
       <BaseInput
         v-model="formData.image_url"
         type="text"
+        name="image_url"
         label="Image URL"
         size="lg"
         placeholder="https://example.com/image.jpg"
@@ -222,6 +239,7 @@ async function save() {
       <BaseInput
         v-model="formData.video_url"
         type="text"
+        name="video_url"
         label="Video URL"
         size="lg"
         placeholder="https://www.youtube.com/watch?v=zkU6Ok44_CI"

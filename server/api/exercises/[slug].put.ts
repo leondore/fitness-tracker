@@ -2,14 +2,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
-import {
-  exercises,
-  exercisesToMuscleGroups,
-  exercisesToStages,
-  type ExerciseToMuscleGroup,
-  type ExerciseToStage,
-} from '~/db/schema';
-import type { ExerciseBody } from '@/types/resources';
+import { exercises, type ExerciseSubmitBody } from '~/db/schema';
 
 export default defineEventHandler(async (event) => {
   const slug = getRouterParam(event, 'slug');
@@ -17,8 +10,8 @@ export default defineEventHandler(async (event) => {
     return handleError(new Error('No slug provided'));
   }
 
-  const { name, description, image_url, video_url, stages, musclegroups } =
-    await readBody<ExerciseBody>(event);
+  const { name, description, image_url, video_url } =
+    await readBody<ExerciseSubmitBody>(event);
 
   try {
     const [updated] = await db
@@ -33,34 +26,8 @@ export default defineEventHandler(async (event) => {
       .where(eq(exercises.slug, slug))
       .returning();
 
-    if (stages && stages.length) {
-      const stagesToInsert: ExerciseToStage[] = stages.map((stage) => ({
-        exerciseId: created.id,
-        stagesId: stage.id,
-      }));
-
-      await db
-        .insert(exercisesToStages)
-        .values(stagesToInsert)
-        .onConflictDoNothing();
-    }
-
-    if (musclegroups && musclegroups.length) {
-      const muscleGroupsToInsert: ExerciseToMuscleGroup[] = musclegroups.map(
-        (musclegroup) => ({
-          exerciseId: created.id,
-          muscleGroupId: musclegroup.id,
-        })
-      );
-
-      await db
-        .insert(exercisesToMuscleGroups)
-        .values(muscleGroupsToInsert)
-        .onConflictDoNothing();
-    }
-
     setResponseStatus(event, 201, 'Created');
-    return created;
+    return updated;
   } catch (err) {
     handleError(err);
   }

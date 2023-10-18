@@ -56,8 +56,10 @@ const nameProp = computed(() => {
   return props.name || fieldId;
 });
 
-const formErrors =
-  inject<Ref<{ path: string; message: string }[]>>('form-errors');
+const formErrors = inject<Ref<{ path: string; message: string }[]>>(
+  'form-errors',
+  ref([])
+);
 const errors = computed(() => {
   return (
     formErrors?.value.filter((error) => error.path === nameProp.value) || []

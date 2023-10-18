@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { uid } from 'uid';
-import type { ColorOpts } from '@/types';
+import type { ColorOpts, SizeOpts } from '@/types';
 
 const fieldId = `textarea_${uid()}`;
 
@@ -9,22 +9,26 @@ type InputVariant = 'outline' | 'none';
 
 interface Props {
   modelValue?: ModelValue;
+  name?: string;
+  required?: boolean;
   label?: string;
   color?: ColorOpts;
   variant?: InputVariant;
+  size?: SizeOpts;
   rows?: number;
   placeholder?: string;
   disabled?: boolean;
-  validationStatus?: Record<string, any>;
 }
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
+  name: '',
+  required: false,
   label: '',
   color: 'primary',
   variant: 'outline',
+  size: 'md',
   rows: 4,
   placeholder: '',
-  validationStatus: () => ({}),
 });
 
 const emits = defineEmits<{
@@ -42,60 +46,25 @@ const value = computed({
   },
 });
 
-const fieldColor = computed(() => {
-  if (props.validationStatus.$dirty) {
-    return props.validationStatus.$invalid ? 'red' : 'green';
-  }
-
-  return props.color;
+const nameProp = computed(() => {
+  return props.name || fieldId;
 });
-
-const validationIcon = computed(() => {
-  return {
-    name: props.validationStatus.$invalid
-      ? 'i-ic-outline-error-outline'
-      : 'i-ic-outline-check-circle-outline',
-    color: props.validationStatus.$invalid ? 'text-red-500' : 'text-green-500',
-  };
-});
-
-const displayErrors = computed(
-  () =>
-    props.validationStatus.$dirty && props.validationStatus.$errors.length > 0
-);
 </script>
 
 <template>
-  <div data-component="textarea">
-    <label v-if="label" :for="fieldId" class="text-xs inline-flex mb-1.5">{{
-      label
-    }}</label>
-
-    <div class="relative">
-      <UTextarea
-        :id="fieldId"
-        v-model="value"
-        :color="fieldColor"
-        :variant="variant"
-        :rows="rows"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        resize
-        class="w-full py-2.5"
-        @change="emits('change', value)"
-        @blur="emits('blur', value)"
-      />
-
-      <small v-if="displayErrors" class="block mt-1 text-xs text-red-500">
-        {{ props.validationStatus.$errors[0].$message }}
-      </small>
-
-      <UIcon
-        v-if="validationStatus.$dirty"
-        :name="validationIcon.name"
-        class="w-5 h-5 absolute top-2 right-3.5"
-        :class="validationIcon.color"
-      />
-    </div>
-  </div>
+  <UFormGroup :label="label" :name="nameProp" :required="required" size="xs">
+    <UTextarea
+      v-model="value"
+      :color="color"
+      :variant="variant"
+      :size="size"
+      :rows="rows"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      resize
+      class="w-full"
+      @change="emits('change', value)"
+      @blur="emits('blur', value)"
+    />
+  </UFormGroup>
 </template>
