@@ -120,7 +120,7 @@ onMounted(() => {
           />
         </div>
 
-        <div class="flex-1 w-full md:w-auto">
+        <div class="flex-1 w-full md:w-auto md:pl-6">
           <NuxtPage />
         </div>
       </div>

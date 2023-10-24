@@ -133,6 +133,8 @@ async function save() {
 
     if (params.slug === 'new') {
       navigateTo(`/admin/exercises/${savedItem.slug}`);
+    } else {
+      navigateTo('/admin/exercises');
     }
     showAlert(`Exercise: ${savedItem.name} was successfully created.`);
 

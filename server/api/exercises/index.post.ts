@@ -6,14 +6,14 @@ import {
   exercises,
   exercisesToMuscleGroups,
   exercisesToStages,
+  type ExerciseSubmitBody,
   type ExerciseToMuscleGroup,
   type ExerciseToStage,
 } from '~/db/schema';
-import type { ExerciseBody } from '@/types/resources';
 
 export default defineEventHandler(async (event) => {
   const { name, description, image_url, video_url, stages, musclegroups } =
-    await readBody<ExerciseBody>(event);
+    await readBody<ExerciseSubmitBody>(event);
 
   try {
     const slug = uid(16);
