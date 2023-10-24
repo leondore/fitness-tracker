@@ -14,7 +14,7 @@ const formData = reactive({
   lastName: '',
   email: '',
   password: '',
-  confirm_password: '',
+  confirmPassword: '',
 });
 
 function clearFormData() {
@@ -22,7 +22,7 @@ function clearFormData() {
   formData.lastName = '';
   formData.email = '';
   formData.password = '';
-  formData.confirm_password = '';
+  formData.confirmPassword = '';
 }
 
 const rules = computed(() => {
@@ -160,7 +160,7 @@ const signUp = async () => {
       />
 
       <BaseInput
-        v-model="formData.confirm_password"
+        v-model="formData.confirmPassword"
         type="password"
         leading-icon="i-ic-outline-key"
         size="lg"

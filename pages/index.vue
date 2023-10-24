@@ -2,6 +2,7 @@
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, helpers } from '@vuelidate/validators';
 import type { AlertProps } from '@/components/BaseAlert.vue';
+import { loginSchema } from '~/db/schema';
 
 const formData = reactive({
   email: '',
@@ -85,32 +86,30 @@ onMounted(() => {
       @close="alert.show = false"
     />
 
-    <form
+    <UForm
       class="p-8 rounded border border-solid border-gray-700 bg-gray-950"
-      @submit.prevent="login"
+      :schema="loginSchema"
+      :state="formData"
+      @submit="login"
     >
       <BaseInput
         v-model="formData.email"
         type="email"
+        name="email"
         leading-icon="i-ic-outline-alternate-email"
         size="lg"
         placeholder="Email Address"
         class="mb-3"
-        :validation-status="v$.email"
-        @change="v$.email.$touch"
-        @blur="v$.email.$touch"
       />
 
       <BaseInput
         v-model="formData.password"
         type="password"
+        name="password"
         leading-icon="i-ic-outline-key"
         size="lg"
         placeholder="Password"
         class="mb-3"
-        :validation-status="v$.password"
-        @change="v$.password.$touch"
-        @blur="v$.password.$touch"
       />
 
       <UButton
@@ -130,6 +129,6 @@ onMounted(() => {
           >Signup Now</NuxtLink
         >
       </p>
-    </form>
+    </UForm>
   </UContainer>
 </template>

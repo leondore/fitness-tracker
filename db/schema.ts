@@ -185,7 +185,7 @@ export const exercisesToStagesRelations = relations(
   })
 );
 
-// Zod
+// Zod schemas
 export const selectExerciseSchema = createSelectSchema(exercises);
 
 export const insertExerciseSchema = createInsertSchema(exercises, {
@@ -245,6 +245,42 @@ export const selectExerciseJoinedSchema =
 
 export const submitExerciseJoinedSchema =
   submitExerciseSchema.merge(joinedToExercises);
+
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: 'Email address field is required' })
+    .email({ message: 'Please enter a valid email address' }),
+  password: z.string().min(1, { message: 'Password field is required' }),
+});
+
+export const signupSchema = z
+  .object({
+    firstName: z.string().min(1, { message: 'First name field is required' }),
+    email: z
+      .string()
+      .min(1, { message: 'Email address field is required' })
+      .email({ message: 'Please enter a valid email address' }),
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters long' })
+      .regex(/[a-z]/, {
+        message: 'Password must contain at least one lowercase letter',
+      })
+      .regex(/[A-Z]/, {
+        message: 'Password must contain at least one uppercase letter',
+      })
+      .regex(/[0-9]/, {
+        message: 'Password must contain at least one number',
+      })
+      .regex(/[@$!%*?&]/, {
+        message: 'Password must contain at least one of the following: @$!%*?&',
+      }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+  });
 
 // Types
 export type Exercise = z.infer<typeof selectExerciseSchema>;

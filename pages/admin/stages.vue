@@ -205,6 +205,14 @@ async function remove(id: number) {
                 :loading="saving"
                 @click="edit"
               />
+              <UButton
+                color="red"
+                variant="solid"
+                icon="i-heroicons-x-circle"
+                size="sm"
+                square
+                @click="clearFormData"
+              />
             </div>
 
             <UBadge v-else size="sm">{{ item.name }}</UBadge>
