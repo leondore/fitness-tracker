@@ -32,7 +32,7 @@ const { data } = await useFetch('/api/dashboard', {
       <BaseCard
         title="Muscle Groups"
         url="/admin/muscle-groups"
-        icon="i-mdi-arm-flex-outline"
+        icon="i-mingcute-fitness-line"
       >
         View all ({{ data?.musclegroups || 0 }})
       </BaseCard>

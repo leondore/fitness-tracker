@@ -14,8 +14,7 @@
   },
   "devDependencies": {
     "@iconify-json/ic": "^1.1.13",
-    "@iconify-json/lucide": "^1.1.114",
-    "@iconify-json/mdi": "^1.1.53",
+    "@iconify-json/mingcute": "^1.1.11",
     "@nuxt/devtools": "latest",
     "@nuxt/image": "^1.0.0-rc.1",
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
@@ -41,6 +40,7 @@
     "@nuxt/ui": "^2.9.0",
     "drizzle-orm": "^0.28.6",
     "drizzle-zod": "^0.5.1",
+    "openai": "^4.13.0",
     "postcss-custom-properties": "^13.3.2"
   }
 }

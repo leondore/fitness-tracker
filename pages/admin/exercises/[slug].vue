@@ -19,6 +19,7 @@ const formData = reactive<ExerciseSubmitBody>({
 
 const saving = ref(false);
 const loading = ref(false);
+const generating = ref(false);
 
 const content = computed(() =>
   params.slug === 'new'
@@ -127,11 +128,7 @@ async function save() {
       body: formData,
     });
 
-    if (params.slug === 'new') {
-      navigateTo(`/admin/exercises/${savedItem.slug}`);
-    } else {
-      navigateTo('/admin/exercises');
-    }
+    navigateTo('/admin/exercises');
     showAlert(`Exercise: ${savedItem.name} was successfully created.`);
 
     clearFormData();
@@ -145,6 +142,31 @@ async function save() {
     saving.value = false;
   }
 }
+
+async function generateDescription() {
+  generating.value = true;
+
+  try {
+    const { data } = await $fetch('/api/ai', {
+      method: 'POST',
+      body: {
+        message: `Can you write a 70 word description of this exercise: ${formData.name}?`,
+      },
+    });
+
+    if (data) {
+      formData.description = data;
+    }
+  } catch (error) {
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while trying to generate.',
+    });
+  } finally {
+    generating.value = false;
+  }
+}
 </script>
 
 <template>
@@ -153,16 +175,32 @@ async function save() {
 
     <header class="flex item-center justify-between pb-6">
       <h2 class="text-xl mb-0">{{ content.title }}</h2>
-      <UButton
-        type="button"
-        variant="solid"
-        size="sm"
-        icon="i-heroicons-arrow-left-20-solid"
-        class="w-32 justify-center"
-        @click="navigateTo('/admin/exercises')"
-      >
-        Back to List
-      </UButton>
+      <div>
+        <UButton
+          type="button"
+          variant="solid"
+          size="sm"
+          icon="i-heroicons-arrow-left-20-solid"
+          class="w-32 justify-center"
+          @click="navigateTo('/admin/exercises')"
+        >
+          Back to List
+        </UButton>
+
+        <UButton
+          type="button"
+          color="sky"
+          variant="solid"
+          size="sm"
+          icon="i-mingcute-openai-line"
+          class="ml-2 justify-center"
+          :disabled="!formData.name"
+          :loading="generating"
+          @click="generateDescription"
+        >
+          Generate Description
+        </UButton>
+      </div>
     </header>
 
     <BaseAlert

@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     superAdmin: '',
     accessToken: '',
     jwtSecret: '',
+    openaiApiKey: '',
     dbDir: resolve('db'),
   },
   devtools: { enabled: true },
@@ -25,7 +26,7 @@ export default defineNuxtConfig({
     },
   },
   ui: {
-    icons: ['ic', 'lucide', 'mdi'],
+    icons: ['ic', 'mingcute'],
     safelistColors: ['indigo', 'red', 'green', 'orange', 'sky', 'gray'],
   },
   googleFonts: {
