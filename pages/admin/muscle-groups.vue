@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MuscleGroup } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
+import { handleError } from '@/utils';
 
 const { alert, showAlert } = useAlert('bodyparts_alert');
 
@@ -37,15 +38,6 @@ const menuItems = (row: { id: number; name: string }) => [
   ],
 ];
 
-function handleError(error: unknown, defaultMessage = '') {
-  let message = defaultMessage;
-  if (error instanceof Error) {
-    message = error.message;
-  }
-
-  showAlert(message, 'error');
-}
-
 function toggleAddNew() {
   showNew.value = !showNew.value;
   alert.show = false;
@@ -80,7 +72,11 @@ async function add() {
       await refreshNuxtData();
     }
   } catch (error) {
-    handleError(error, 'An error occurred while trying to save.');
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while trying to save.',
+    });
   } finally {
     saving.value = false;
   }
@@ -108,7 +104,11 @@ async function edit() {
       await refreshNuxtData();
     }
   } catch (error) {
-    handleError(error, 'An error occurred while trying to save.');
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while trying to delete.',
+    });
   } finally {
     saving.value = false;
   }
@@ -130,7 +130,11 @@ async function remove(id: number) {
       await refreshNuxtData();
     }
   } catch (error) {
-    handleError(error, 'An error occurred while trying to delete.');
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while trying to delete.',
+    });
   }
 }
 </script>

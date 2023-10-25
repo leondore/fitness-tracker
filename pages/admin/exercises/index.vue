@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ExerciseFull } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
+import { handleError } from '@/utils';
 
 const { alert, showAlert } = useAlert('exercises_alert');
 
@@ -44,15 +45,6 @@ const menuItems = (row: ExerciseFull) => [
   ],
 ];
 
-function handleError(error: unknown, defaultMessage = '') {
-  let message = defaultMessage;
-  if (error instanceof Error) {
-    message = error.message;
-  }
-
-  showAlert(message, 'error');
-}
-
 async function remove(id: number) {
   try {
     const [deletedItem] = await $fetch('/api/exercises', {
@@ -69,7 +61,11 @@ async function remove(id: number) {
       await refreshNuxtData();
     }
   } catch (error) {
-    handleError(error, 'An error occurred while trying to delete.');
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while trying to delete.',
+    });
   }
 }
 </script>

@@ -1,14 +1,7 @@
 <script setup lang="ts">
-import type { ColorOpts } from '@/types';
+import type { ColorOpts, Alert } from '@/types';
 
-export interface AlertProps {
-  name: string;
-  type?: 'success' | 'error' | 'warning' | 'info';
-  message: string;
-  timeout?: number;
-  closeable?: boolean;
-}
-const props = withDefaults(defineProps<AlertProps>(), {
+const props = withDefaults(defineProps<Alert>(), {
   type: undefined,
   timeout: 0,
   closeable: true,

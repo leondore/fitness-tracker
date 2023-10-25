@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core';
-import {
-  required,
-  email,
-  sameAs,
-  minLength,
-  helpers,
-} from '@vuelidate/validators';
-import type { AlertProps } from '@/components/BaseAlert.vue';
+import { signupSchema } from '~/db/schema';
+import { useAlert } from '@/composables/alert';
+import { handleError } from '@/utils';
+
+const { alert, showAlert } = useAlert('signup_alert');
 
 const formData = reactive({
   firstName: '',
@@ -25,51 +21,8 @@ function clearFormData() {
   formData.confirmPassword = '';
 }
 
-const rules = computed(() => {
-  return {
-    firstName: {
-      required: helpers.withMessage(
-        'The first name field is required',
-        required
-      ),
-    },
-    email: {
-      required: helpers.withMessage('The email field is required', required),
-      email: helpers.withMessage('The email is incorrectly formatted', email),
-    },
-    password: {
-      required: helpers.withMessage('The password field is required', required),
-      minLength: helpers.withMessage(
-        'The password must be at least 8 characters long',
-        minLength(8)
-      ),
-    },
-    confirm_password: {
-      required: helpers.withMessage(
-        'The password confirmation field is required',
-        required
-      ),
-      sameAs: helpers.withMessage(
-        "Passwords don't match",
-        sameAs(formData.password)
-      ),
-    },
-  };
-});
-const v$ = useVuelidate(rules, formData);
-
-const alert = reactive<AlertProps & { show: boolean }>({
-  name: 'signup_alert',
-  show: false,
-  type: 'success',
-  message: '',
-});
-
 const loading = ref(false);
 const signUp = async () => {
-  v$.value.$validate();
-  if (v$.value.$error) return;
-
   loading.value = true;
 
   try {
@@ -79,21 +32,17 @@ const signUp = async () => {
     });
 
     if (user) {
-      alert.show = true;
-      alert.type = 'success';
-      alert.message =
-        "You've signed up successfully! Please check your email so you can verify your account.";
+      showAlert(
+        "You've signed up successfully! Please check your email so you can verify your account."
+      );
     }
     clearFormData();
-    v$.value.$reset();
   } catch (error) {
-    let message = 'An error occurred while signing up. Please try again.';
-    if (error instanceof Error) {
-      message = error.message;
-    }
-    alert.show = true;
-    alert.type = 'error';
-    alert.message = message;
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while signing up. Please try again.',
+    });
   } finally {
     loading.value = false;
   }
@@ -112,23 +61,24 @@ const signUp = async () => {
       @close="alert.show = false"
     />
 
-    <form
+    <UForm
       class="p-8 rounded border border-solid border-gray-700 bg-gray-950"
-      @submit.prevent="signUp"
+      :schema="signupSchema"
+      :state="formData"
+      @submit="signUp"
     >
       <div class="grid grid-cols-2 gap-3 mb-3">
         <BaseInput
           v-model="formData.firstName"
+          name="firstName"
           leading-icon="i-ic-outline-person"
           size="lg"
           placeholder="First Name"
-          :validation-status="v$.firstName"
-          @change="v$.firstName.$touch"
-          @blur="v$.firstName.$touch"
         />
 
         <BaseInput
           v-model="formData.lastName"
+          name="lastName"
           leading-icon="i-ic-outline-person"
           size="lg"
           placeholder="Last Name"
@@ -138,37 +88,31 @@ const signUp = async () => {
       <BaseInput
         v-model="formData.email"
         type="email"
+        name="email"
         leading-icon="i-ic-outline-alternate-email"
         size="lg"
         placeholder="Email Address"
         class="mb-3"
-        :validation-status="v$.email"
-        @change="v$.email.$touch"
-        @blur="v$.email.$touch"
       />
 
       <BaseInput
         v-model="formData.password"
         type="password"
+        name="password"
         leading-icon="i-ic-outline-key"
         size="lg"
         placeholder="Password"
         class="mb-3"
-        :validation-status="v$.password"
-        @change="v$.password.$touch"
-        @blur="v$.password.$touch"
       />
 
       <BaseInput
         v-model="formData.confirmPassword"
         type="password"
+        name="confirmPassword"
         leading-icon="i-ic-outline-key"
         size="lg"
         placeholder="Confirm Password"
         class="mb-3"
-        :validation-status="v$.confirm_password"
-        @change="v$.confirm_password.$touch"
-        @blur="v$.confirm_password.$touch"
       />
 
       <UButton
@@ -188,6 +132,6 @@ const signUp = async () => {
           >Login Here</NuxtLink
         >
       </p>
-    </form>
+    </UForm>
   </UContainer>
 </template>

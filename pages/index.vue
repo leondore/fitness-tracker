@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core';
-import { required, email, helpers } from '@vuelidate/validators';
-import type { AlertProps } from '@/components/BaseAlert.vue';
 import { loginSchema } from '~/db/schema';
+import { useAlert } from '@/composables/alert';
+import { handleError } from '@/utils';
+
+const { alert, showAlert } = useAlert('login_alert');
 
 const formData = reactive({
   email: '',
@@ -14,33 +15,11 @@ function clearFormData() {
   formData.password = '';
 }
 
-const rules = computed(() => {
-  return {
-    email: {
-      required: helpers.withMessage('The email field is required', required),
-      email: helpers.withMessage('The email is incorrectly formatted', email),
-    },
-    password: {
-      required: helpers.withMessage('The password field is required', required),
-    },
-  };
-});
-const v$ = useVuelidate(rules, formData);
-
-const alert = reactive<AlertProps & { show: boolean }>({
-  name: 'login_alert',
-  show: false,
-  type: 'error',
-  message: '',
-});
-
 const loading = ref(false);
 const client = useSupabaseClient();
 const login = async () => {
-  v$.value.$validate();
-  if (v$.value.$error) return;
-
   loading.value = true;
+
   try {
     const { error } = await client.auth.signInWithPassword({
       email: formData.email,
@@ -50,15 +29,12 @@ const login = async () => {
     if (error) throw error;
 
     clearFormData();
-    v$.value.$reset();
   } catch (error) {
-    let message = 'An error occurred while logging in.';
-    if (error instanceof Error) {
-      message = error.message;
-    }
-
-    alert.show = true;
-    alert.message = message;
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while logging in.',
+    });
   } finally {
     loading.value = false;
   }

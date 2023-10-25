@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { submitExerciseSchema, type ExerciseSubmitBody } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
+import { handleError } from '@/utils';
 
 const { alert, showAlert } = useAlert('exercises_insert_alert');
 
@@ -24,15 +25,6 @@ const content = computed(() =>
     ? { title: 'Add New Exercise', btn: 'Add Exercise' }
     : { title: 'Edit Exercise', btn: 'Save Changes' }
 );
-
-function handleError(error: unknown, defaultMessage = '') {
-  let message = defaultMessage;
-  if (error instanceof Error) {
-    message = error.message;
-  }
-
-  showAlert(message, 'error');
-}
 
 // ---- Reset State ---- //
 function clearFormData() {
@@ -96,7 +88,11 @@ async function getExercise(slug: string | string[]) {
 
     return exercise;
   } catch (error) {
-    handleError(error, 'An error occurred while trying to load the data.');
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while trying to load the data.',
+    });
   } finally {
     loading.value = false;
   }
@@ -140,7 +136,11 @@ async function save() {
 
     clearFormData();
   } catch (error) {
-    handleError(error, 'An error occurred while trying to save.');
+    handleError({
+      error,
+      callback: showAlert,
+      defaultMessage: 'An error occurred while trying to save.',
+    });
   } finally {
     saving.value = false;
   }
