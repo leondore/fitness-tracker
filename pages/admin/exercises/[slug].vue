@@ -147,7 +147,7 @@ async function generateDescription() {
   generating.value = true;
 
   try {
-    const { data } = await $fetch('/api/ai', {
+    const { data } = await $fetch('/api/generate-content', {
       method: 'POST',
       body: {
         message: `Can you write a 70 word description of this exercise: ${formData.name}?`,
@@ -186,20 +186,6 @@ async function generateDescription() {
         >
           Back to List
         </UButton>
-
-        <UButton
-          type="button"
-          color="sky"
-          variant="solid"
-          size="sm"
-          icon="i-mingcute-openai-line"
-          class="ml-2 justify-center"
-          :disabled="!formData.name"
-          :loading="generating"
-          @click="generateDescription"
-        >
-          Generate Description
-        </UButton>
       </div>
     </header>
 
@@ -229,14 +215,30 @@ async function generateDescription() {
         required
       />
 
-      <BaseTextarea
-        v-model="formData.description"
-        name="description"
-        label="Description"
-        size="lg"
-        placeholder="Push-ups are a classic and effective bodyweight exercise that targets the upper body, especially the chest, shoulders, and triceps."
-        class="col-span-2"
-      />
+      <div class="col-span-2 relative group">
+        <BaseTextarea
+          v-model="formData.description"
+          name="description"
+          label="Description"
+          size="lg"
+          placeholder="Push-ups are a classic and effective bodyweight exercise that targets the upper body, especially the chest, shoulders, and triceps."
+          :rows="5"
+        />
+
+        <UButton
+          type="button"
+          color="sky"
+          variant="solid"
+          size="xs"
+          icon="i-mingcute-openai-line"
+          class="w-full sm:w-auto justify-center mt-2 sm:mt-0 sm:absolute sm:bottom-2.5 sm:right-2.5 z-10 sm:!opacity-0 sm:group-hover:!opacity-100 sm:group-focus-within:!opacity-100 transition-opacity ease-in-out duration-200"
+          :disabled="!formData.name"
+          :loading="generating"
+          @click="generateDescription"
+        >
+          Generate Description
+        </UButton>
+      </div>
 
       <BaseSelect
         v-if="!musclesError"
