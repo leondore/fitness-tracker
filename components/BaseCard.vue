@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ColorOpts } from 'types';
+import type { ColorOpts } from '@/types';
 
 interface Props {
   title: string;
@@ -26,18 +26,18 @@ const colorClass = {
 <template>
   <NuxtLink
     :to="url"
-    class="flex items-center justify-between rounded-md border border-solid border-gray-700 bg-gray-950 py-5 px-6"
+    class="flex items-center justify-between rounded-md border border-solid border-gray-700 bg-gray-950 px-6 py-5"
   >
     <div>
-      <h4 class="font-semibold text-lg text-gray-100 mb-1">{{ title }}</h4>
+      <h4 class="mb-1 text-lg font-semibold text-gray-100">{{ title }}</h4>
       <p class="m-0 text-[0.8125rem] text-gray-400"><slot /></p>
     </div>
 
     <div
-      class="rounded w-12 h-12 flex items-center justify-center"
+      class="flex h-12 w-12 items-center justify-center rounded"
       :class="colorClass[color]"
     >
-      <UIcon :name="icon" class="text-white text-3xl" />
+      <UIcon :name="icon" class="text-3xl text-white" />
     </div>
   </NuxtLink>
 </template>

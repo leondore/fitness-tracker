@@ -26,6 +26,9 @@ export default defineEventHandler(async (event) => {
       last_name: lastName,
       phone,
     },
+    app_metadata: {
+      roles: [Role.Member],
+    },
     email_confirm: true,
   });
 
