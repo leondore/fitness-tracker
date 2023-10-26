@@ -72,8 +72,8 @@ async function remove(id: number) {
 
 <template>
   <div>
-    <header class="flex item-center justify-between pb-6">
-      <h2 class="text-xl mb-0">Exercises List</h2>
+    <header class="item-center flex justify-between pb-6">
+      <h2 class="mb-0 text-xl">Exercises List</h2>
       <UButton
         type="button"
         variant="solid"

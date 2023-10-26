@@ -8,11 +8,11 @@ const { data } = await useFetch('/api/dashboard', {
 
 <template>
   <div>
-    <h2 class="text-xl mb-5">
+    <h2 class="mb-5 text-xl">
       Welcome Back {{ user?.user_metadata?.first_name || 'friend' }}!
     </h2>
 
-    <div class="grid lg:grid-cols-3 gap-5">
+    <div class="grid gap-5 lg:grid-cols-3">
       <BaseCard
         title="Exercises"
         url="/admin/exercises"

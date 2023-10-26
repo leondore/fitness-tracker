@@ -139,8 +139,8 @@ async function remove(id: number) {
 
 <template>
   <div>
-    <header class="flex item-center justify-between pb-6">
-      <h2 class="text-xl mb-0">Routine Stages</h2>
+    <header class="item-center flex justify-between pb-6">
+      <h2 class="mb-0 text-xl">Routine Stages</h2>
       <UButton
         type="button"
         variant="solid"
@@ -175,7 +175,7 @@ async function remove(id: number) {
         variant="solid"
         icon="i-ic-outline-save"
         size="2xs"
-        class="absolute top-[18px] right-1.5"
+        class="absolute right-1.5 top-[18px]"
         :disabled="!newItem.name"
         :loading="saving"
         @click="add"
@@ -184,7 +184,7 @@ async function remove(id: number) {
       </UButton>
     </div>
 
-    <div class="relative border-t border-gray-600 mt-3">
+    <div class="relative mt-3 border-t border-gray-600">
       <BaseLoader v-if="pending" :full-page="false" />
 
       <div v-if="error" class="text-center">
@@ -195,7 +195,7 @@ async function remove(id: number) {
         <div
           v-for="item in stages"
           :key="`stage_${item.id}`"
-          class="flex items-center justify-between p-2 border-b border-gray-600"
+          class="flex items-center justify-between border-b border-gray-600 p-2"
         >
           <div>
             <div v-if="toEdit.id === item.id" class="flex items-center gap-2">

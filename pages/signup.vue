@@ -51,7 +51,7 @@ const signUp = async () => {
 
 <template>
   <UContainer as="div" class="py-4">
-    <h2 class="text-2xl text-center mb-5">Signup</h2>
+    <h2 class="mb-5 text-center text-2xl">Signup</h2>
     <BaseAlert
       v-if="alert.show"
       :type="alert.type"
@@ -62,12 +62,12 @@ const signUp = async () => {
     />
 
     <UForm
-      class="p-8 rounded border border-solid border-gray-700 bg-gray-950"
+      class="rounded border border-solid border-gray-700 bg-gray-950 p-8"
       :schema="signupSchema"
       :state="formData"
       @submit="signUp"
     >
-      <div class="grid grid-cols-2 gap-3 mb-3">
+      <div class="mb-3 grid grid-cols-2 gap-3">
         <BaseInput
           v-model="formData.firstName"
           name="firstName"
@@ -126,7 +126,7 @@ const signUp = async () => {
         Signup
       </UButton>
 
-      <p class="text-center mt-3 text-sm">
+      <p class="mt-3 text-center text-sm">
         Already have an account?
         <NuxtLink to="/" class="text-indigo-300 hover:underline"
           >Login Here</NuxtLink

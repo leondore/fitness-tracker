@@ -48,9 +48,9 @@ onMounted(() => {
 <template>
   <div>
     <header
-      class="sticky top-0 z-50 w-full backdrop-blur flex-none border-b border-gray-200 dark:border-gray-800 bg-white/75 dark:bg-gray-900/75"
+      class="sticky top-0 z-50 w-full flex-none border-b border-gray-200 bg-white/75 backdrop-blur dark:border-gray-800 dark:bg-gray-900/75"
     >
-      <UContainer as="div" class="py-3 flex items-center justify-between">
+      <UContainer as="div" class="flex items-center justify-between py-3">
         <h1 class="font-semibold">Fitness Tracker</h1>
         <div class="flex items-center gap-2">
           <UButton
@@ -67,7 +67,7 @@ onMounted(() => {
             size="sm"
             icon="i-ic-outline-logout"
             variant="soft"
-            class="px-4 hidden md:flex"
+            class="hidden px-4 md:flex"
             @click="logout"
           >
             Logout
@@ -92,7 +92,7 @@ onMounted(() => {
           :class="{ 'nav-active': navOpen }"
         >
           <p
-            class="text-sm font-semibold text-gray-900 dark:text-gray-200 truncate leading-6"
+            class="truncate text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200"
           >
             Navigation
           </p>
@@ -120,7 +120,7 @@ onMounted(() => {
           />
         </div>
 
-        <div class="flex-1 w-full md:w-auto md:pl-6">
+        <div class="w-full flex-1 md:w-auto md:pl-6">
           <NuxtPage />
         </div>
       </div>
@@ -130,6 +130,6 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .nav-active {
-  @apply fixed top-[57px] left-0 bottom-0 w-full z-50 bg-gray-900 px-6 py-4 block;
+  @apply fixed bottom-0 left-0 top-[57px] z-50 block w-full bg-gray-900 px-6 py-4;
 }
 </style>

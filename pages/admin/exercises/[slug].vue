@@ -173,8 +173,8 @@ async function generateDescription() {
   <div>
     <BaseLoader v-if="loading" :full-page="true" />
 
-    <header class="flex item-center justify-between pb-6">
-      <h2 class="text-xl mb-0">{{ content.title }}</h2>
+    <header class="item-center flex justify-between pb-6">
+      <h2 class="mb-0 text-xl">{{ content.title }}</h2>
       <div>
         <UButton
           type="button"
@@ -199,7 +199,7 @@ async function generateDescription() {
     />
 
     <UForm
-      class="grid grid-cols-2 gap-4 p-8 rounded-md border border-solid border-zinc-700 bg-zinc-950"
+      class="grid grid-cols-2 gap-4 rounded-md border border-solid border-zinc-700 bg-zinc-950 p-8"
       :schema="submitExerciseSchema"
       :state="formData"
       @submit="save"
@@ -215,7 +215,7 @@ async function generateDescription() {
         required
       />
 
-      <div class="col-span-2 relative group">
+      <div class="group relative col-span-2">
         <BaseTextarea
           v-model="formData.description"
           name="description"
@@ -231,7 +231,7 @@ async function generateDescription() {
           variant="solid"
           size="xs"
           icon="i-mingcute-openai-line"
-          class="w-full sm:w-auto justify-center mt-2 sm:mt-0 sm:absolute sm:bottom-2.5 sm:right-2.5 z-10 sm:!opacity-0 sm:group-hover:!opacity-100 sm:group-focus-within:!opacity-100 transition-opacity ease-in-out duration-200"
+          class="z-10 mt-2 w-full justify-center transition-opacity duration-200 ease-in-out sm:absolute sm:bottom-2.5 sm:right-2.5 sm:mt-0 sm:w-auto sm:!opacity-0 sm:group-focus-within:!opacity-100 sm:group-hover:!opacity-100"
           :disabled="!formData.name"
           :loading="generating"
           @click="generateDescription"

@@ -52,7 +52,7 @@ onMounted(() => {
 
 <template>
   <UContainer as="div" class="py-4">
-    <h2 class="text-2xl text-center mb-5">Login</h2>
+    <h2 class="mb-5 text-center text-2xl">Login</h2>
     <BaseAlert
       v-if="alert.show"
       :type="alert.type"
@@ -63,7 +63,7 @@ onMounted(() => {
     />
 
     <UForm
-      class="p-8 rounded border border-solid border-gray-700 bg-gray-950"
+      class="rounded border border-solid border-gray-700 bg-gray-950 p-8"
       :schema="loginSchema"
       :state="formData"
       @submit="login"
@@ -99,7 +99,7 @@ onMounted(() => {
         Login
       </UButton>
 
-      <p class="text-center mt-3 text-sm">
+      <p class="mt-3 text-center text-sm">
         Don't have an account?
         <NuxtLink to="/signup" class="text-indigo-300 hover:underline"
           >Signup Now</NuxtLink
