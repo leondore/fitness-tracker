@@ -1,9 +1,12 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
+import authRoutes from '~/server/authRoutes';
 import { exercises } from '~/db/schema';
 
 export default defineEventHandler(async (event) => {
+  await authRoutes(event);
+
   const slug = getRouterParam(event, 'slug');
   if (!slug) {
     return handleError(new Error('No slug provided'));

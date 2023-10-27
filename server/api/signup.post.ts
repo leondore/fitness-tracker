@@ -1,5 +1,3 @@
-import { db } from '../utils/db';
-import { handleError } from '../utils/helpers';
 import { users } from '~/db/schema';
 import { Role } from '~/types/auth';
 import { serverSupabaseServiceRole } from '#supabase/server';
@@ -27,7 +25,7 @@ export default defineEventHandler(async (event) => {
       phone,
     },
     app_metadata: {
-      roles: [Role.Member],
+      role: Role.Member,
     },
     email_confirm: true,
   });

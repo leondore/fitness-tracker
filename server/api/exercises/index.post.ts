@@ -2,6 +2,7 @@
 import { uid } from 'uid';
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
+import authRoutes from '~/server/authRoutes';
 import {
   exercises,
   exercisesToMuscleGroups,
@@ -12,6 +13,8 @@ import {
 } from '~/db/schema';
 
 export default defineEventHandler(async (event) => {
+  await authRoutes(event);
+
   const { name, description, image_url, video_url, stages, musclegroups } =
     await readBody<ExerciseSubmitBody>(event);
 

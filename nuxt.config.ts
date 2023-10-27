@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxtjs/google-fonts',
     '@nuxtjs/supabase',
+    '@pinia/nuxt',
     '@nuxt/ui',
   ],
   app: {

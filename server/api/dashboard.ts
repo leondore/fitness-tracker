@@ -1,9 +1,12 @@
 import { sql } from 'drizzle-orm';
 import { db } from '../utils/db';
 import { handleError } from '../utils/helpers';
+import authRoutes from '../authRoutes';
 import { exercises, stages, muscleGroups } from '~/db/schema';
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  await authRoutes(event);
+
   try {
     const exercisesCount = db
       .select({ count: sql<number>`count(*)` })
