@@ -20,6 +20,10 @@ const adminMenu = [
     to: '/admin/muscle-groups',
     label: 'Muscle Groups',
   },
+  {
+    to: '/admin/users',
+    label: 'Users',
+  },
 ];
 
 const navOpen = ref(false);

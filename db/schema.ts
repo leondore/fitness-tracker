@@ -246,6 +246,8 @@ export const selectExerciseJoinedSchema =
 export const submitExerciseJoinedSchema =
   submitExerciseSchema.merge(joinedToExercises);
 
+export const userSchema = createSelectSchema(users);
+
 export const loginSchema = z.object({
   email: z
     .string()
@@ -284,6 +286,8 @@ export const signupSchema = z
   });
 
 // Types
+export type User = z.infer<typeof userSchema>;
+
 export type Exercise = z.infer<typeof selectExerciseSchema>;
 export type ExerciseFull = z.infer<typeof selectExerciseJoinedSchema>;
 
