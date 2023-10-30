@@ -71,6 +71,14 @@ async function remove(id: string) {
     });
   }
 }
+
+const idToCopy = ref('');
+const { copy, copied } = useClipboard();
+
+function copyId(id: string) {
+  idToCopy.value = id;
+  copy(idToCopy.value);
+}
 </script>
 
 <template>
@@ -113,7 +121,7 @@ async function remove(id: string) {
 
         <template #id-data="{ row }: { row: User }">
           <div
-            class="relative w-32 items-center overflow-hidden overflow-ellipsis whitespace-nowrap"
+            class="group relative w-32 items-center overflow-hidden overflow-ellipsis whitespace-nowrap py-4"
           >
             {{ row.id }}
             <UButton
@@ -121,9 +129,10 @@ async function remove(id: string) {
               variant="soft"
               icon="i-mingcute-copy-2-line"
               size="2xs"
-              class="absolute right-0"
+              class="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 transition-opacity ease-out group-hover:opacity-100"
+              @click="copyId(row.id)"
             >
-              Copy
+              {{ copied ? 'Copied' : 'Copy' }}
             </UButton>
           </div>
         </template>
