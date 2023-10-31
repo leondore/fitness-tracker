@@ -7,10 +7,12 @@ export default defineNuxtConfig({
     databaseUrl: '',
     databaseAuthToken: '',
     superAdmin: '',
-    accessToken: '',
     jwtSecret: '',
     openaiApiKey: '',
     dbDir: resolve('db'),
+    public: {
+      accessToken: '',
+    },
   },
   devtools: { enabled: true },
   modules: [

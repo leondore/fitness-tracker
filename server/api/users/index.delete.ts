@@ -5,6 +5,7 @@ import authRoutes from '~/server/authRoutes';
 import { users, type User } from '~/db/schema';
 
 export default defineEventHandler(async (event) => {
+  const token = getHeader(event, 'Cookie');
   await authRoutes(event);
 
   const { id } = await readBody<User>(event);
