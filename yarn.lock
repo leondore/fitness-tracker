@@ -5452,6 +5452,11 @@ joi@^17.7.0:
     "@sideway/formula" "^3.0.1"
     "@sideway/pinpoint" "^2.0.0"
 
+jose@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.0.1.tgz#a2f0bb241ecfe6ebf37ef435498a491918a1a0e0"
+  integrity sha512-gRVzy7s3RRdGbXmcTdlOswJOjhwPLx1ijIgAqLY6ktzFpOJxxYn4l0fC2vHaHHi4YBX/5FOL3aY+6W0cvQgpug==
+
 js-base64@^3.7.5:
   version "3.7.5"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-3.7.5.tgz#21e24cf6b886f76d6f5f165bfcd69cc55b9e3fca"

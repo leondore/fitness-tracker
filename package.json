@@ -44,6 +44,7 @@
     "@vueuse/nuxt": "^10.5.0",
     "drizzle-orm": "^0.28.6",
     "drizzle-zod": "^0.5.1",
+    "jose": "^5.0.1",
     "openai": "^4.13.0",
     "postcss-custom-properties": "^13.3.2"
   }

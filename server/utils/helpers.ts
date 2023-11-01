@@ -6,8 +6,8 @@ export function handleError(
   if (err instanceof Error) {
     message = err.message;
   }
-  throw createError({
-    statusCode: 500,
+  return createError({
+    status: 500,
     statusMessage: message,
   });
 }
