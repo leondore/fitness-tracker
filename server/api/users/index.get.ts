@@ -1,9 +1,9 @@
 import { db } from '../../utils/db';
 import { handleError } from '../../utils/helpers';
-import authRoutes from '~/server/authRoutes';
+import adminRoutes from '~/server/adminRoutes';
 
 export default defineEventHandler(async (event) => {
-  await authRoutes(event);
+  await adminRoutes(event);
 
   try {
     const items = await db.query.users.findMany({
@@ -17,6 +17,6 @@ export default defineEventHandler(async (event) => {
     });
     return items;
   } catch (err) {
-    handleError(err);
+    handleError(event, err);
   }
 });

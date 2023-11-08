@@ -37,6 +37,6 @@ export default defineEventHandler(async (event) => {
     });
     return items;
   } catch (err) {
-    handleError(err);
+    handleError(event, err);
   }
 });

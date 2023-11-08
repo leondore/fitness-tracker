@@ -36,7 +36,7 @@ export default async (event: H3Event<EventHandlerRequest>) => {
   const secret = new TextEncoder().encode(jwtSecret);
   const { payload } = await jwtVerify(token, secret);
 
-  if (!payload.aud || !payload.sub || payload.aud !== 'authenticated') {
+  if (!payload.sub || !payload.aud || payload.aud !== 'authenticated') {
     throw unauthorizedError;
   }
 
@@ -48,6 +48,4 @@ export default async (event: H3Event<EventHandlerRequest>) => {
   if (!user || !dbUser || dbUser.roleId !== Role.Admin) {
     throw unauthorizedError;
   }
-
-  event.context.auth = user;
 };

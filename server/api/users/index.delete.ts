@@ -16,6 +16,10 @@ export default defineEventHandler(async (event) => {
       .where(eq(users.id, id))
       .returning();
 
+    if (!deleted || deleted.length === 0) {
+      throw createError({ statusCode: 404, message: 'User Not Found' });
+    }
+
     const client = serverSupabaseServiceRole(event);
     const { error } = await client.auth.admin.deleteUser(id);
 
@@ -24,8 +28,8 @@ export default defineEventHandler(async (event) => {
     }
 
     setResponseStatus(event, 200, 'OK');
-    return deleted;
+    return { user: deleted[0] };
   } catch (err) {
-    return handleError(err);
+    handleError(event, err);
   }
 });

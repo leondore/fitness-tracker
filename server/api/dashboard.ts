@@ -27,6 +27,6 @@ export default defineEventHandler(async (event) => {
       musclegroups: musclegroupsCountResult[0].count,
     };
   } catch (err) {
-    handleError(err);
+    handleError(event, err);
   }
 });

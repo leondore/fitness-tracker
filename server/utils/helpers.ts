@@ -1,6 +1,7 @@
-import { H3Error } from 'h3';
+import { H3Error, H3Event } from 'h3';
 
 export function handleError(
+  event: H3Event,
   err: unknown,
   defaultMsg: string = 'Internal Server Error'
 ) {
@@ -15,10 +16,13 @@ export function handleError(
     code = err.statusCode;
   }
 
-  return createError({
-    status: code,
-    statusMessage: message,
-  });
+  return sendError(
+    event,
+    createError({
+      status: code,
+      statusMessage: message,
+    })
+  );
 }
 
 export function slugify(text: string) {

@@ -19,6 +19,6 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 200, 'OK');
     return updated;
   } catch (err) {
-    handleError(err);
+    handleError(event, err);
   }
 });

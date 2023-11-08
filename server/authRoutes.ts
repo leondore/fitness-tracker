@@ -17,6 +17,4 @@ export default async (event: H3Event<EventHandlerRequest>) => {
       message: 'Unauthorized',
     });
   }
-
-  event.context.auth = user;
 };

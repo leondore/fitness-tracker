@@ -55,6 +55,6 @@ export default defineEventHandler(async (event) => {
     return data.user;
   } catch (err) {
     await client.auth.admin.deleteUser(data.user.id);
-    handleError(err);
+    handleError(event, err);
   }
 });

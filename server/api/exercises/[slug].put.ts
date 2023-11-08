@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   const slug = getRouterParam(event, 'slug');
   if (!slug) {
-    return handleError(new Error('No slug provided'));
+    throw createError({ statusCode: 400, message: 'No Slug Provided' });
   }
 
   const { name, description, image_url, video_url, musclegroups, stages } =
@@ -102,6 +102,6 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 200, 'OK');
     return updated;
   } catch (err) {
-    handleError(err);
+    handleError(event, err);
   }
 });

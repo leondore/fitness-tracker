@@ -1,11 +1,11 @@
 import { OpenAI } from 'openai';
-import authRoutes from '../authRoutes';
+import adminRoutes from '../adminRoutes';
 
 const config = useRuntimeConfig();
 const openai = new OpenAI({ apiKey: config.openaiApiKey });
 
 export default defineEventHandler(async (event) => {
-  await authRoutes(event);
+  await adminRoutes(event);
 
   const { message } = await readBody<{ message: string }>(event);
 

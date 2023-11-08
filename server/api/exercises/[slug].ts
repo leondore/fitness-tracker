@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const slug = getRouterParam(event, 'slug');
   if (!slug) {
-    return handleError(new Error('No slug provided'));
+    throw createError({ statusCode: 400, message: 'No Slug Provided' });
   }
 
   try {
@@ -42,6 +42,6 @@ export default defineEventHandler(async (event) => {
     });
     return item;
   } catch (err) {
-    handleError(err);
+    handleError(event, err);
   }
 });

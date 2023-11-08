@@ -52,14 +52,14 @@ const menuItems = (row: User) => [
 
 async function remove(id: string) {
   try {
-    const [deletedItem] = await $fetch('/api/users', {
+    const { user } = await $fetch('/api/users', {
       method: 'DELETE',
-      body: { id },
+      body: { id: id + 'hello' },
     });
 
-    showAlert(`User: ${deletedItem?.email} was deleted successfully.`);
+    showAlert(`User: ${user.email} was deleted successfully.`);
     if (users.value) {
-      users.value = users.value.filter((item) => item.id !== deletedItem?.id);
+      users.value = users.value.filter((item) => item.id !== user.id);
     } else {
       await refreshNuxtData();
     }
