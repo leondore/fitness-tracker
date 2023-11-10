@@ -11,6 +11,7 @@ interface Props {
   modelValue?: ModelValue;
   options?: string[] | { [key: string]: any; disabled?: boolean }[];
   by?: string;
+  valueAttr?: string;
   optionAttr?: string;
   name?: string;
   required?: boolean;
@@ -29,7 +30,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   options: () => [],
-  by: 'id',
+  by: undefined,
+  valueAttr: undefined,
   optionAttr: 'label',
   name: '',
   required: false,
@@ -66,6 +68,17 @@ const selected = computed(() => {
 
   if (typeof props.modelValue === 'object') {
     return props.modelValue[props.optionAttr];
+  }
+
+  if (typeof props.options[0] === 'object') {
+    const options = props.options as {
+      [key: string]: any;
+      disabled?: boolean;
+    }[];
+    const current = options.find((option) => option.id === props.modelValue);
+    if (current) {
+      return current[props.optionAttr];
+    }
   }
 
   return props.modelValue;
@@ -110,6 +123,7 @@ const suffixIcon = computed(() => {
       v-model="value"
       :options="options"
       :by="by"
+      :value-attribute="valueAttr"
       :option-attribute="optionAttr"
       :multiple="multiple"
       :leading-icon="leadingIcon"

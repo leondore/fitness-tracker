@@ -2,6 +2,7 @@
 import { submitExerciseSchema, type UserSubmit } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
+import { Role } from '~/types/auth';
 
 const { alert, showAlert } = useAlert('users_insert_alert');
 
@@ -16,8 +17,6 @@ const formData = reactive<UserSubmit>({
 });
 
 const saving = ref(false);
-const loading = ref(false);
-const generating = ref(false);
 
 const content = computed(() =>
   params.id === 'new'
@@ -27,81 +26,30 @@ const content = computed(() =>
 
 // ---- Reset State ---- //
 function clearFormData() {
-  formData.name = '';
-  formData.description = '';
-  formData.image_url = '';
-  formData.video_url = '';
-  formData.stages = [];
-  formData.musclegroups = [];
+  formData.email = '';
+  formData.firstName = '';
+  formData.lastName = '';
+  formData.roleId = 1;
 }
 
+const roleOptions: { id: Role; label: string }[] = [
+  { id: 1, label: 'Member' },
+  { id: 2, label: 'Admin' },
+];
+
 // ---- Get User Data ---- //
-const {
-  data: user,
-  pending,
-  error,
-} = await useFetch(`/api/users/${params.id}`, {
+const { data: user, pending } = await useFetch(`/api/users/${params.id}`, {
   lazy: true,
   immediate: params.id !== 'new',
 });
 
-// ---- Get Muscles Group Select Options ---- //
-const {
-  data: muscles,
-  pending: musclesPending,
-  error: musclesError,
-} = await useFetch('/api/muscle-groups', {
-  lazy: true,
-});
-const musclesOptions = computed(() => muscles.value || undefined);
-
-// ---- Get Exercise Data ---- //
-async function getExercise(slug: string | string[]) {
-  loading.value = true;
-
-  try {
-    const data = await $fetch(`/api/exercises/${slug}`);
-
-    if (!data.length) {
-      throw new Error('Exercise not found.');
-    }
-
-    const exercise: ExerciseSubmitBody = data[0];
-    if (
-      exercise.exercisesToMuscleGroups &&
-      exercise.exercisesToMuscleGroups.length
-    ) {
-      exercise.musclegroups = [];
-      exercise.exercisesToMuscleGroups.forEach((muscleGroup) => {
-        exercise.musclegroups?.push(muscleGroup.muscleGroups);
-      });
-      delete exercise.exercisesToMuscleGroups;
-    }
-    if (exercise.exercisesToStages && exercise.exercisesToStages.length) {
-      exercise.stages = [];
-      exercise.exercisesToStages.forEach((stage) => {
-        exercise.stages?.push(stage.stages);
-      });
-      delete exercise.exercisesToStages;
-    }
-
-    return exercise;
-  } catch (error) {
-    handleError({
-      error,
-      callback: showAlert,
-      defaultMessage: 'An error occurred while trying to load the data.',
-    });
-  } finally {
-    loading.value = false;
-  }
-}
-
-watchEffect(async () => {
+watchEffect(() => {
   if (user.value) {
     Object.assign(formData, user.value);
   }
 });
+
+const loading = computed(() => params.id !== 'new' && pending.value);
 
 // ---- Submission Function ---- //
 async function save() {
@@ -135,31 +83,6 @@ async function save() {
     saving.value = false;
   }
 }
-
-async function generateDescription() {
-  generating.value = true;
-
-  try {
-    const { data } = await $fetch('/api/generate-content', {
-      method: 'POST',
-      body: {
-        message: `Can you write a 70 word description of this exercise: ${formData.name}?`,
-      },
-    });
-
-    if (data) {
-      formData.description = data;
-    }
-  } catch (error) {
-    handleError({
-      error,
-      callback: showAlert,
-      defaultMessage: 'An error occurred while trying to generate.',
-    });
-  } finally {
-    generating.value = false;
-  }
-}
 </script>
 
 <template>
@@ -175,7 +98,7 @@ async function generateDescription() {
           size="sm"
           icon="i-heroicons-arrow-left-20-solid"
           class="w-32 justify-center"
-          @click="navigateTo('/admin/exercises')"
+          @click="navigateTo('/admin/users')"
         >
           Back to List
         </UButton>
@@ -199,86 +122,43 @@ async function generateDescription() {
     >
       <BaseInput
         v-model="formData.email"
-        type="text"
-        name="name"
-        label="Name"
+        type="email"
+        name="email"
+        label="Email Address"
         size="lg"
-        placeholder="Ex. Push-Ups"
-        class="col-span-2"
+        class="col-span-2 md:col-span-1"
         required
       />
 
-      <div class="group relative col-span-2">
-        <BaseTextarea
-          v-model="formData.description"
-          name="description"
-          label="Description"
-          size="lg"
-          placeholder="Push-ups are a classic and effective bodyweight exercise that targets the upper body, especially the chest, shoulders, and triceps."
-          :rows="5"
-        />
-
-        <UButton
-          type="button"
-          color="sky"
-          variant="solid"
-          size="xs"
-          icon="i-mingcute-openai-line"
-          class="z-10 mt-2 w-full justify-center transition-opacity duration-200 ease-in-out sm:absolute sm:bottom-2.5 sm:right-2.5 sm:mt-0 sm:w-auto sm:!opacity-0 sm:group-focus-within:!opacity-100 sm:group-hover:!opacity-100"
-          :disabled="!formData.name"
-          :loading="generating"
-          @click="generateDescription"
-        >
-          Generate Description
-        </UButton>
-      </div>
-
       <BaseSelect
-        v-if="!musclesError"
-        v-model="formData.musclegroups"
-        name="musclegroups"
-        label="Muscle Groups"
+        v-model="formData.roleId"
+        name="roleId"
+        label="Role"
         size="lg"
-        multiple
-        placeholder="Select a muscle group"
         class="col-span-2 md:col-span-1"
-        option-attr="name"
-        :options="musclesOptions"
-        :loading="musclesPending"
-      />
-
-      <BaseSelect
-        v-if="!stagesError"
-        v-model="formData.stages"
-        name="stages"
-        label="Routine Stages"
-        size="lg"
-        multiple
-        placeholder="Select applicable stages"
-        class="col-span-2 md:col-span-1"
-        option-attr="name"
-        :options="stagesOptions"
-        :loading="stagesPending"
+        value-attr="id"
+        option-attr="label"
+        :options="roleOptions"
       />
 
       <BaseInput
-        v-model="formData.image_url"
+        v-model="formData.firstName"
         type="text"
-        name="image_url"
-        label="Image URL"
+        name="firstName"
+        label="First Name"
         size="lg"
-        placeholder="https://example.com/image.jpg"
         class="col-span-2 md:col-span-1"
+        required
       />
 
       <BaseInput
-        v-model="formData.video_url"
+        v-model="formData.lastName"
         type="text"
-        name="video_url"
-        label="Video URL"
+        name="lastName"
+        label="Last Name"
         size="lg"
-        placeholder="https://www.youtube.com/watch?v=zkU6Ok44_CI"
         class="col-span-2 md:col-span-1"
+        required
       />
 
       <UButton
