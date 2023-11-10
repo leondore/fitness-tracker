@@ -9,6 +9,7 @@ import {
 } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { Role } from '~/types/auth';
 
 export const roles = sqliteTable(
   'roles',
@@ -247,6 +248,10 @@ export const submitExerciseJoinedSchema =
   submitExerciseSchema.merge(joinedToExercises);
 
 export const userSchema = createSelectSchema(users);
+export const submitUserSchema = createInsertSchema(users).extend({
+  id: z.string().optional(),
+  roleId: z.nativeEnum(Role),
+});
 
 export const loginSchema = z.object({
   email: z
@@ -287,6 +292,7 @@ export const signupSchema = z
 
 // Types
 export type User = z.infer<typeof userSchema>;
+export type UserSubmit = z.infer<typeof submitUserSchema>;
 
 export type Exercise = z.infer<typeof selectExerciseSchema>;
 export type ExerciseFull = z.infer<typeof selectExerciseJoinedSchema>;
