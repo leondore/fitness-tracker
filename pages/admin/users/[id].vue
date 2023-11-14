@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { submitExerciseSchema, type UserSubmit } from '~/db/schema';
+import { submitUserSchema, type UserSubmit } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
 import { Role } from '~/types/auth';
@@ -18,12 +18,6 @@ const formData = reactive<UserSubmit>({
 
 const saving = ref(false);
 
-const content = computed(() =>
-  params.id === 'new'
-    ? { title: 'Add New User', btn: 'Add User' }
-    : { title: 'Edit User', btn: 'Save Changes' }
-);
-
 // ---- Reset State ---- //
 function clearFormData() {
   formData.email = '';
@@ -40,7 +34,6 @@ const roleOptions: { id: Role; label: string }[] = [
 // ---- Get User Data ---- //
 const { data: user, pending } = await useFetch(`/api/users/${params.id}`, {
   lazy: true,
-  immediate: params.id !== 'new',
 });
 
 watchEffect(() => {
@@ -49,28 +42,18 @@ watchEffect(() => {
   }
 });
 
-const loading = computed(() => params.id !== 'new' && pending.value);
-
 // ---- Submission Function ---- //
 async function save() {
   saving.value = true;
 
-  type SubmitParams = {
-    url: '/api/exercises' | `/api/exercises/${string}`;
-    method: 'POST' | 'PUT';
-  };
-  const apiUrl: SubmitParams['url'] =
-    params.slug === 'new' ? '/api/exercises' : `/api/exercises/${params.slug}`;
-  const method: SubmitParams['method'] = params.slug === 'new' ? 'POST' : 'PUT';
-
   try {
-    const savedItem = await $fetch(apiUrl, {
-      method,
+    const { user } = await $fetch(`/api/users/${params.id}`, {
+      method: 'PUT',
       body: formData,
     });
 
-    navigateTo('/admin/exercises');
-    showAlert(`Exercise: ${savedItem.name} was successfully created.`);
+    navigateTo('/admin/users');
+    showAlert(`User: : ${user.email} was successfully created.`);
 
     clearFormData();
   } catch (error) {
@@ -87,10 +70,10 @@ async function save() {
 
 <template>
   <div>
-    <BaseLoader v-if="loading" :full-page="true" />
+    <BaseLoader v-if="pending" :full-page="true" />
 
     <header class="item-center flex justify-between pb-6">
-      <h2 class="mb-0 text-xl">{{ content.title }}</h2>
+      <h2 class="mb-0 text-xl">Edit User</h2>
       <div>
         <UButton
           type="button"
@@ -116,7 +99,7 @@ async function save() {
 
     <UForm
       class="grid grid-cols-2 gap-4 rounded-md border border-solid border-zinc-700 bg-zinc-950 p-8"
-      :schema="submitExerciseSchema"
+      :schema="submitUserSchema"
       :state="formData"
       @submit="save"
     >
@@ -127,7 +110,7 @@ async function save() {
         label="Email Address"
         size="lg"
         class="col-span-2 md:col-span-1"
-        required
+        disabled
       />
 
       <BaseSelect
@@ -158,7 +141,6 @@ async function save() {
         label="Last Name"
         size="lg"
         class="col-span-2 md:col-span-1"
-        required
       />
 
       <UButton
@@ -170,7 +152,7 @@ async function save() {
         class="col-span-2 mt-2"
         :loading="saving"
       >
-        {{ content.btn }}
+        Save Changes
       </UButton>
     </UForm>
   </div>

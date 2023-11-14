@@ -54,7 +54,7 @@ async function remove(id: string) {
   try {
     const { user } = await $fetch('/api/users', {
       method: 'DELETE',
-      body: { id: id + 'hello' },
+      body: { id },
     });
 
     showAlert(`User: ${user.email} was deleted successfully.`);
@@ -91,7 +91,7 @@ function copyId(id: string) {
         size="sm"
         icon="i-heroicons-plus-circle"
         class="w-32 justify-center"
-        @click="navigateTo('/admin/users/new')"
+        @click="navigateTo('/signup')"
       >
         Add New
       </UButton>
