@@ -1,4 +1,8 @@
 <script setup lang="ts">
+useHead({
+  title: 'Dashboard | Fitness Tracker',
+});
+
 const user = useSupabaseUser();
 
 const { data } = await useFetch('/api/dashboard', {

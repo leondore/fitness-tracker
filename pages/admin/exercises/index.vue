@@ -3,6 +3,10 @@ import type { ExerciseFull } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
 
+useHead({
+  title: 'Exercises | Fitness Tracker',
+});
+
 const { alert, showAlert } = useAlert('exercises_alert');
 
 const { data: exercises, pending } = await useFetch('/api/exercises', {

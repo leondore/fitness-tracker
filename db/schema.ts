@@ -293,6 +293,7 @@ export const signupSchema = z
 // Types
 export type User = z.infer<typeof userSchema>;
 export type UserSubmit = z.infer<typeof submitUserSchema>;
+export type UserSignup = z.infer<typeof signupSchema> & { lastName?: string };
 
 export type Exercise = z.infer<typeof selectExerciseSchema>;
 export type ExerciseFull = z.infer<typeof selectExerciseJoinedSchema>;

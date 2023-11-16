@@ -3,6 +3,10 @@ import { loginSchema } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
 
+useHead({
+  title: 'Login | Fitness Tracker',
+});
+
 const { alert, showAlert } = useAlert('login_alert');
 
 const formData = reactive({

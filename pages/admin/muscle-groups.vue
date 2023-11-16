@@ -3,6 +3,10 @@ import type { MuscleGroup } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
 
+useHead({
+  title: 'Muscle Groups | Fitness Tracker',
+});
+
 const { alert, showAlert } = useAlert('bodyparts_alert');
 
 // ---- Component State ---- //

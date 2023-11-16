@@ -4,6 +4,10 @@ import { Role } from '~/types/auth';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
 
+useHead({
+  title: 'Users | Fitness Tracker',
+});
+
 const { alert, showAlert } = useAlert('users_alert');
 
 const { data: users, pending } = await useFetch('/api/users', {
@@ -91,7 +95,7 @@ function copyId(id: string) {
         size="sm"
         icon="i-heroicons-plus-circle"
         class="w-32 justify-center"
-        @click="navigateTo('/signup')"
+        @click="navigateTo('/admin/users/new')"
       >
         Add New
       </UButton>

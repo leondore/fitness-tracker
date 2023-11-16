@@ -3,6 +3,10 @@ import type { Stage } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
 
+useHead({
+  title: 'Routine Stages | Fitness Tracker',
+});
+
 const { alert, showAlert } = useAlert('stages_alert');
 
 // ---- Component State ---- //

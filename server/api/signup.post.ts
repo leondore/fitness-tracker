@@ -1,18 +1,13 @@
-import { users } from '~/db/schema';
+import adminRoutes from '../adminRoutes';
+import { users, type UserSignup } from '~/db/schema';
 import { Role } from '~/types/auth';
 import { serverSupabaseServiceRole } from '#supabase/server';
 
-interface SignUpBody {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName?: string;
-  phone?: string;
-}
-
 export default defineEventHandler(async (event) => {
-  const { email, password, firstName, lastName, phone } =
-    await readBody<SignUpBody>(event);
+  await adminRoutes(event);
+
+  const { email, password, firstName, lastName } =
+    await readBody<UserSignup>(event);
 
   const client = serverSupabaseServiceRole(event);
 
@@ -22,7 +17,6 @@ export default defineEventHandler(async (event) => {
     user_metadata: {
       first_name: firstName,
       last_name: lastName,
-      phone,
     },
     app_metadata: {
       role: Role.Member,
@@ -47,12 +41,11 @@ export default defineEventHandler(async (event) => {
       email,
       firstName,
       lastName,
-      phone,
       roleId: Role.Member,
     });
 
     setResponseStatus(event, 201, 'User created');
-    return data.user;
+    return { user: data.user };
   } catch (err) {
     await client.auth.admin.deleteUser(data.user.id);
     handleError(event, err);

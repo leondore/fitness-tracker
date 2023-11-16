@@ -3,6 +3,10 @@ import { submitExerciseSchema, type ExerciseSubmitBody } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
 
+useHead({
+  title: 'Add/Edit Exercise | Fitness Tracker',
+});
+
 const { alert, showAlert } = useAlert('exercises_insert_alert');
 
 // ---- Component State ---- //

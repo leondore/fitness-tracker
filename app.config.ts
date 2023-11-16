@@ -6,5 +6,8 @@ export default defineAppConfig({
         base: 'relative',
       },
     },
+    input: {
+      base: 'disabled:opacity-40',
+    },
   },
 });

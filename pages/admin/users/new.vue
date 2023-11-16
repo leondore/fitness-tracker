@@ -1,63 +1,46 @@
 <script setup lang="ts">
-import { submitUserSchema, type UserSubmit } from '~/db/schema';
+import { signupSchema, type UserSignup } from '~/db/schema';
 import { useAlert } from '@/composables/alert';
 import { handleError } from '@/utils';
-import { Role } from '~/types/auth';
 
 useHead({
-  title: 'Edit User | Fitness Tracker',
+  title: 'Add User | Fitness Tracker',
 });
 
 const { alert, showAlert } = useAlert('users_insert_alert');
 
 // ---- Component State ---- //
-const { params } = useRoute();
-
-const formData = reactive<UserSubmit>({
+const formData = reactive<UserSignup>({
   email: '',
   firstName: '',
   lastName: '',
-  roleId: 1,
+  password: '',
+  confirmPassword: '',
 });
-
-const saving = ref(false);
 
 // ---- Reset State ---- //
 function clearFormData() {
   formData.email = '';
   formData.firstName = '';
   formData.lastName = '';
-  formData.roleId = 1;
+  formData.password = '';
+  formData.confirmPassword = '';
 }
 
-const roleOptions: { id: Role; label: string }[] = [
-  { id: 1, label: 'Member' },
-  { id: 2, label: 'Admin' },
-];
-
-// ---- Get User Data ---- //
-const { data: user, pending } = await useFetch(`/api/users/${params.id}`, {
-  lazy: true,
-});
-
-watchEffect(() => {
-  if (user.value) {
-    Object.assign(formData, user.value);
-  }
-});
+const saving = ref(false);
 
 // ---- Submission Function ---- //
 async function save() {
   saving.value = true;
 
   try {
-    const { user } = await $fetch(`/api/users/${params.id}`, {
-      method: 'PUT',
+    const { user } = await $fetch('/api/signup', {
+      method: 'POST',
       body: formData,
     });
 
     navigateTo('/admin/users');
-    showAlert(`User: : ${user.email} was successfully created.`);
+    showAlert(`User: ${user.email} was successfully created.`);
 
     clearFormData();
   } catch (error) {
@@ -74,10 +57,8 @@ async function save() {
 
 <template>
   <div>
-    <BaseLoader v-if="pending" :full-page="true" />
-
     <header class="item-center flex justify-between pb-6">
-      <h2 class="mb-0 text-xl">Edit User</h2>
+      <h2 class="mb-0 text-xl">Add User</h2>
       <div>
         <UButton
           type="button"
@@ -103,7 +84,7 @@ async function save() {
 
     <UForm
       class="grid grid-cols-2 gap-4 rounded-md border border-solid border-zinc-700 bg-zinc-950 p-8"
-      :schema="submitUserSchema"
+      :schema="signupSchema"
       :state="formData"
       @submit="save"
     >
@@ -114,20 +95,8 @@ async function save() {
         label="Email Address"
         leading-icon="i-ic-outline-alternate-email"
         size="lg"
-        class="col-span-2 md:col-span-1"
-        disabled
-      />
-
-      <BaseSelect
-        v-model="formData.roleId"
-        name="roleId"
-        label="Role"
-        leading-icon="i-ic-outline-assignment-ind"
-        size="lg"
-        class="col-span-2 md:col-span-1"
-        value-attr="id"
-        option-attr="label"
-        :options="roleOptions"
+        class="col-span-2"
+        required
       />
 
       <BaseInput
@@ -151,6 +120,28 @@ async function save() {
         class="col-span-2 md:col-span-1"
       />
 
+      <BaseInput
+        v-model="formData.password"
+        type="password"
+        name="password"
+        label="Password"
+        leading-icon="i-ic-outline-key"
+        size="lg"
+        class="col-span-2 md:col-span-1"
+        required
+      />
+
+      <BaseInput
+        v-model="formData.confirmPassword"
+        type="password"
+        name="confirmPassword"
+        label="Confirm Password"
+        leading-icon="i-ic-outline-key"
+        size="lg"
+        class="col-span-2 md:col-span-1"
+        required
+      />
+
       <UButton
         type="submit"
         color="indigo"
@@ -160,7 +151,7 @@ async function save() {
         class="col-span-2 mt-2"
         :loading="saving"
       >
-        Save Changes
+        Add User
       </UButton>
     </UForm>
   </div>
