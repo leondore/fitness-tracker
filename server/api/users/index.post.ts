@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
     }
 
     setResponseStatus(event, 201, 'User created');
-    return data.user;
+    return { user: data.user };
   } catch (err) {
     await client.auth.admin.deleteUser(data.user.id);
     handleError(event, err);

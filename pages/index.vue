@@ -103,7 +103,7 @@ onMounted(() => {
         Login
       </UButton>
 
-      <p class="mt-3 text-center text-sm">
+      <p v-if="false" class="mt-3 text-center text-sm">
         Don't have an account?
         <NuxtLink to="/signup" class="text-indigo-300 hover:underline"
           >Signup Now</NuxtLink
